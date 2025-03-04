@@ -5,13 +5,74 @@ import ProductItem from "../components/ProductItem";
 
 const Collection = () => {
   const [showFilter, setShowFilter] = useState(false);
-  const [allProducts, setAllProducts] = useState([]);
+  const [filterProducts, setFilterProducts] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState([]);
+  const [typeFilter, setTypeFilter] = useState([]);
+  const [sortType, setSortType] = useState("relevant");
 
   const { products } = useContext(ShopContext);
 
+  const toggleCategoryFilter = (e) => {
+    if (categoryFilter.includes(e.target.value)) {
+      setCategoryFilter((prev) =>
+        prev.filter((item) => item !== e.target.value)
+      );
+    } else {
+      setCategoryFilter((prev) => [...prev, e.target.value]);
+    }
+  };
+
+  const toggleTypeFilter = (e) => {
+    if (typeFilter.includes(e.target.value)) {
+      setTypeFilter((prev) => prev.filter((item) => item !== e.target.value));
+    } else {
+      setTypeFilter((prev) => [...prev, e.target.value]);
+    }
+  };
+
+  const applyFilter = () => {
+    let productsCopy = products.slice();
+
+    if (categoryFilter.length > 0) {
+      productsCopy = productsCopy.filter((item) =>
+        categoryFilter.includes(item.category)
+      );
+    }
+
+    if (typeFilter.length > 0) {
+      productsCopy = productsCopy.filter((item) =>
+        typeFilter.includes(item.subCategory)
+      );
+    }
+
+    setFilterProducts(productsCopy);
+  };
+
+  const sortPoducts = () => {
+    let filterProductsCopy = filterProducts.slice();
+
+    switch (sortType) {
+      case "low-to-high":
+        setFilterProducts(filterProductsCopy.sort((a, b) => a.price - b.price));
+        break;
+
+      case "high-to-low":
+        setFilterProducts(filterProductsCopy.sort((a, b) => b.price - a.price));
+        break;
+
+      default:
+        applyFilter();
+        break;
+    }
+  };
+
   useEffect(() => {
-    setAllProducts(products);
-  }, []);
+    applyFilter();
+  }, [categoryFilter, typeFilter]);
+
+  useEffect(() => {
+    sortPoducts();
+  }, [sortType]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t ">
@@ -38,13 +99,31 @@ const Collection = () => {
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-800">
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Men`} /> Men
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Men`}
+                onChange={toggleCategoryFilter}
+              />{" "}
+              Men
             </p>
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Women`} /> Women
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Women`}
+                onChange={toggleCategoryFilter}
+              />{" "}
+              Women
             </p>
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Kids`} /> Kids
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Kids`}
+                onChange={toggleCategoryFilter}
+              />{" "}
+              Kids
             </p>
           </div>
         </div>
@@ -58,15 +137,30 @@ const Collection = () => {
           <p className="mb-3 text-sm font-medium">TYPES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-800">
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Topwear`} />
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Topwear`}
+                onChange={toggleTypeFilter}
+              />
               Topwear
             </p>
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Bottomwear`} />
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Bottomwear`}
+                onChange={toggleTypeFilter}
+              />
               Bottomwear
             </p>
             <p className="flex gap-2">
-              <input type="checkbox" className="w-3" value={`Winterwear`} />
+              <input
+                type="checkbox"
+                className="w-3"
+                value={`Winterwear`}
+                onChange={toggleTypeFilter}
+              />
               Winterwear
             </p>
           </div>
@@ -83,7 +177,10 @@ const Collection = () => {
             <p className="w-8 sm:w-12 h-[1.5px] sm:h-[2px] bg-gray-700"></p>
           </div>
           {/* Product Sorting */}
-          <select className="border-2 border-gray-400 text-sm p-2  ">
+          <select
+            onChange={(e) => setSortType(e.target.value)}
+            className="border-2 border-gray-400 text-sm p-2  "
+          >
             <option value="relevant">Sort by: relevant</option>
             <option value="low-to-high">Sort by: Low to high</option>
             <option value="high-to-low">Sort by: High to low</option>
@@ -92,7 +189,7 @@ const Collection = () => {
 
         {/* Show all products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {allProducts.map((product, index) => (
+          {filterProducts.map((product, index) => (
             <ProductItem
               key={index}
               id={product._id}
