@@ -109,7 +109,7 @@ const Collection = () => {
                 className="w-3"
                 value={`Men`}
                 onChange={toggleCategoryFilter}
-              />{" "}
+              />
               Men
             </p>
             <p className="flex gap-2">
