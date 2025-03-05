@@ -32,7 +32,7 @@ const Product = () => {
         {/* Product Images */}
         <div className="flex flex-1 flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal w-full sm:w-[19%]">
-            {productData.image.map((image, index) => (
+            {productData?.image.map((image, index) => (
               <img
                 onClick={() => setImage(image)}
                 src={image}
@@ -50,24 +50,24 @@ const Product = () => {
         <div className="flex-1 ">
           <h1 className="text-2xl font-medium mt-4">{productData.name}</h1>
           <div className="flex items-center gap-1 mt-4">
-            <img src={assets.star_icon} alt="" className="w-3.5" />
-            <img src={assets.star_icon} alt="" className="w-3.5" />
-            <img src={assets.star_icon} alt="" className="w-3.5" />
-            <img src={assets.star_icon} alt="" className="w-3.5" />
-            <img src={assets.star_dull_icon} alt="" className="w-3.5" />
+            <img src={assets?.star_icon} alt="" className="w-3.5" />
+            <img src={assets?.star_icon} alt="" className="w-3.5" />
+            <img src={assets?.star_icon} alt="" className="w-3.5" />
+            <img src={assets?.star_icon} alt="" className="w-3.5" />
+            <img src={assets?.star_dull_icon} alt="" className="w-3.5" />
             <p className="pl-2">(122)</p>
           </div>
           <p className="mt-6 text-2xl font-medium">
             {currency}
-            {productData.price}
+            {productData?.price}
           </p>
           <p className="mt-6 md:w-4/5 text-gray-600">
-            {productData.description}
+            {productData?.description}
           </p>
           <div className="flex flex-col gap-4 my-10">
             <p>Select Size</p>
             <div className="flex gap-2">
-              {productData.sizes.map((item, index) => (
+              {productData?.sizes.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => setSize(item)}
@@ -81,7 +81,7 @@ const Product = () => {
             </div>
           </div>
           <button
-            onClick={() => addToCart(productData._id, size)}
+            onClick={() => addToCart(productData?._id, size)}
             className="bg-black text-white px-8 py-3 cursor-pointer transition-colors duration-200 ease-in hover:text-black hover:bg-gray-100"
           >
             ADD TO CART
@@ -127,8 +127,8 @@ const Product = () => {
 
       {/* Related Products */}
       <RelatedProducts
-        category={productData.category}
-        type={productData.subCategory}
+        category={productData?.category}
+        type={productData?.subCategory}
       />
     </div>
   ) : (

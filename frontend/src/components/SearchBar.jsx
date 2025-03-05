@@ -34,7 +34,7 @@ const SearchBar = () => {
       <img
         onClick={() => setShowSearch(false)}
         className="inline w-3 cursor-pointer"
-        src={assets.cross_icon}
+        src={assets?.cross_icon}
         alt="Cross Icon"
       />
     </div>

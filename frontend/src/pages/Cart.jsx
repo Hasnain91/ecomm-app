@@ -39,7 +39,7 @@ const Cart = () => {
       </div>
 
       <div>
-        {cartData.map((item, index) => {
+        {cartData?.map((item, index) => {
           const productData = products.find(
             (product) => product._id === item._id
           );
@@ -52,18 +52,18 @@ const Cart = () => {
               <div className="flex items-start gap-6">
                 <img
                   className="w-16 sm:w-20"
-                  src={productData.image[0]}
+                  src={productData?.image[0]}
                   alt=""
                 />
 
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
-                    {productData.name}
+                    {productData?.name}
                   </p>
                   <div className="flex items-center mt-2 gap-5">
                     <p>
                       {currency}
-                      {productData.price}
+                      {productData?.price}
                     </p>
                     <p className="px-2 sm:px-3 sm:py-1 border bg-slate-100">
                       {item.size}

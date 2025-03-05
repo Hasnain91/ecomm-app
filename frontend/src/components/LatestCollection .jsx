@@ -30,13 +30,13 @@ const LatestCollection = () => {
 
       {/* Display Products with product item comp */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 gap-y-6">
-        {latestProducts.map((product, index) => (
+        {latestProducts?.map((product, index) => (
           <ProductItem
             key={index}
-            name={product.name}
-            id={product._id}
-            image={product.image}
-            price={product.price}
+            name={product?.name}
+            id={product?._id}
+            image={product?.image}
+            price={product?.price}
           />
         ))}
       </div>

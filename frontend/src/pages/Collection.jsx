@@ -118,7 +118,7 @@ const Collection = () => {
                 className="w-3"
                 value={`Women`}
                 onChange={toggleCategoryFilter}
-              />{" "}
+              />
               Women
             </p>
             <p className="flex gap-2">
@@ -127,7 +127,7 @@ const Collection = () => {
                 className="w-3"
                 value={`Kids`}
                 onChange={toggleCategoryFilter}
-              />{" "}
+              />
               Kids
             </p>
           </div>
@@ -194,13 +194,13 @@ const Collection = () => {
 
         {/* Show all products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {filterProducts.map((product, index) => (
+          {filterProducts?.map((product, index) => (
             <ProductItem
               key={index}
-              id={product._id}
-              image={product.image}
-              name={product.name}
-              price={product.price}
+              id={product?._id}
+              image={product?.image}
+              name={product?.name}
+              price={product?.price}
             />
           ))}
         </div>
