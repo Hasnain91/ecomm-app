@@ -1,9 +1,11 @@
 import React from "react";
+import toast from "react-hot-toast";
 
 const Newsletter = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Form Submitted");
+    // alert("Form Submitted");
+    toast.success("Form Submitted Successfully");
   };
 
   return (

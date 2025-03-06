@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const connectCloudinary = require("./config/cloudinary");
 const userRoutes = require("./routes/userRoutes.js");
+const productRoutes = require("./routes/productRoutes.js");
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
-connectCloudinary;
+connectCloudinary();
 
 // middlewares
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(cors());
 
 // API endpoints
 app.use("/api/user", userRoutes);
+app.use("/api/product", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is working");
