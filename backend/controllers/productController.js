@@ -61,12 +61,44 @@ const addProduct = async (req, res) => {
 };
 
 // get all Products
-const listProducts = async (req, res) => {};
+const listProducts = async (req, res) => {
+  try {
+    const products = await Product.find({});
+    res.status(200).json({ success: true, products });
+  } catch (error) {
+    console.log("Error in listProducts controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
 
 // Remove Product
-const removeProduct = async (req, res) => {};
+const removeProduct = async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.body.id);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Producted Deleted Successfully!!" });
+  } catch (error) {
+    console.log("Error in removeProduct controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
 
 // Get single Product
-const getProduct = async (req, res) => {};
+const getProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    console.log(product);
+
+    res.status(200).json({ success: true, product });
+  } catch (error) {
+    console.log("Error in getProduct controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
 
 module.exports = { addProduct, listProducts, removeProduct, getProduct };
