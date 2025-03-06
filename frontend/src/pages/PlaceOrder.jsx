@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CartTotal from "../components/CartTotal";
-import { assets } from "../assets/assets";
+import { assets } from "../constants/index";
 import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { assets } from "../assets/assets";
+import { assets } from "../constants/index";
 import Newsletter from "../components/Newsletter";
 
 const Contact = () => {

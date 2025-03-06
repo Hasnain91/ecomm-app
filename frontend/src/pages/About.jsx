@@ -1,5 +1,5 @@
 import React from "react";
-import { assets } from "../assets/assets";
+import { assets } from "../constants/index";
 import Newsletter from "../components/Newsletter";
 
 const About = () => {
@@ -16,7 +16,7 @@ const About = () => {
 
       <div className="my-10 flex flex-col md:flex-row gap-16">
         <img
-          src={assets.about_img}
+          src={assets?.about_img}
           alt="Image "
           className="w-full md:w-[450px]"
         />
