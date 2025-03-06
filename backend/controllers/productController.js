@@ -92,8 +92,6 @@ const getProduct = async (req, res) => {
 
     const product = await Product.findById(id);
 
-    console.log(product);
-
     res.status(200).json({ success: true, product });
   } catch (error) {
     console.log("Error in getProduct controller: ", error);

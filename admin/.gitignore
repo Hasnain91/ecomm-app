@@ -22,9 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-backend/node_modules
-backend/.env
-
-admin/src/assets
-frontend/src/assets
