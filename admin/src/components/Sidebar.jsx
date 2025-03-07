@@ -7,8 +7,10 @@ const Sidebar = () => {
         <NavLink
           to="/add-product"
           className={({ isActive }) =>
-            `flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-lg ${
-              isActive ? "border-pink-700 bg-pink-200" : ""
+            `flex items-center gap-3  border-r-0 px-3 py-2 rounded-lg ${
+              isActive
+                ? "border border-pink-700 bg-pink-200"
+                : " border border-gray-300"
             }`
           }
         >
@@ -18,8 +20,10 @@ const Sidebar = () => {
         <NavLink
           to="/list-products"
           className={({ isActive }) =>
-            `flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-lg ${
-              isActive ? "border-pink-700 bg-pink-200" : ""
+            `flex items-center gap-3  border-r-0 px-3 py-2 rounded-lg ${
+              isActive
+                ? "border border-pink-700 bg-pink-200"
+                : "border border-gray-300"
             }`
           }
         >
@@ -29,8 +33,10 @@ const Sidebar = () => {
         <NavLink
           to="/orders"
           className={({ isActive }) =>
-            `flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-lg ${
-              isActive ? "border-pink-700 bg-pink-200" : ""
+            `flex items-center gap-3  border-r-0 px-3 py-2 rounded-lg ${
+              isActive
+                ? "border border-pink-700 bg-pink-200"
+                : "border border-gray-300"
             }`
           }
         >

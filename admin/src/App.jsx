@@ -6,8 +6,9 @@ import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
 import Login from "./components/Login";
 import AddProduct from "./pages/AddProduct";
-import ListProducts from "./pages/AddProduct";
-import Orders from "./pages/AddProduct";
+import Home from "./pages/Home";
+import ListProducts from "./pages/ListProducts";
+import Orders from "./pages/Orders";
 import { backendUrl } from "./constants/index";
 import { useEffect } from "react";
 
@@ -22,7 +23,7 @@ const App = () => {
   }, [token]);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="bg-gray-200 min-h-screen">
       <Toaster />
       {token === "" ? (
         <Login setToken={setToken} />
@@ -34,6 +35,8 @@ const App = () => {
             <Sidebar />
             <div className="w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-gray-600 text-base">
               <Routes>
+                <Route path="/" element={<Home />} />
+
                 <Route
                   path="/add-product"
                   element={<AddProduct token={token} />}
