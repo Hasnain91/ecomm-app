@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const connectCloudinary = require("./config/cloudinary");
 const userRoutes = require("./routes/userRoutes.js");
 const productRoutes = require("./routes/productRoutes.js");
+const cartRoutes = require("./routes/cartRoutes.js");
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(cors());
 // API endpoints
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is working");
