@@ -17,6 +17,8 @@ import razorpay_logo from "../assets/razorpay_logo.png";
 import stripe_logo from "../assets/stripe_logo.png";
 import cross_icon from "../assets/cross_icon.png";
 
+export const baseUrl = "http://localhost:3000";
+
 export const assets = {
   logo,
   hero_img,
