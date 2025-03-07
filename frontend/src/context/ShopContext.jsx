@@ -39,6 +39,22 @@ const ShopContextProvider = ({ children }) => {
 
     setCartItems(cartData);
     toast.success("Product added to the cart");
+
+    if (token) {
+      try {
+        await axios.post(
+          `${backendUrl}/api/cart/add`,
+          {
+            productId,
+            size,
+          },
+          { headers: { token } }
+        );
+      } catch (error) {
+        console.log("error in addToCart function in ShopContext: ", error);
+        toast.error(error?.message);
+      }
+    }
   };
 
   const getCartCount = () => {
@@ -58,12 +74,29 @@ const ShopContextProvider = ({ children }) => {
     return totalCount;
   };
 
-  const updateQuantity = async (productId, size, quantity) => {
+  const updateQuantity = async (itemId, size, quantity) => {
     let cartData = structuredClone(cartItems);
 
-    cartData[productId][size] = quantity;
+    cartData[itemId][size] = quantity;
 
     setCartItems(cartData);
+
+    if (token) {
+      try {
+        await axios.post(
+          `${backendUrl}/api/cart/update`,
+          {
+            itemId,
+            size,
+            quantity,
+          },
+          { headers: { token } }
+        );
+      } catch (error) {
+        console.log("Error in updateQuantity: ", error);
+        toast.error(error?.message);
+      }
+    }
   };
 
   const getCartAmount = () => {
@@ -100,6 +133,23 @@ const ShopContextProvider = ({ children }) => {
     }
   };
 
+  const getUserCart = async (token) => {
+    try {
+      const res = await axios.post(
+        `${backendUrl}/api/cart/get`,
+        {},
+        { headers: { token } }
+      );
+
+      if (res.data.success) {
+        setCartItems(res.data.cartData);
+      }
+    } catch (error) {
+      console.log("Error in getUserCart: ", error);
+      toast.error(error?.message);
+    }
+  };
+
   useEffect(() => {
     getProductsData();
   }, []);
@@ -107,6 +157,7 @@ const ShopContextProvider = ({ children }) => {
   useEffect(() => {
     if (!token && localStorage.getItem("token")) {
       setToken(localStorage.getItem("token"));
+      getUserCart(localStorage.getItem("token"));
     }
   }, []);
 
