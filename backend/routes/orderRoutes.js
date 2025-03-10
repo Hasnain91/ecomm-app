@@ -2,6 +2,7 @@ const express = require("express");
 const {
   placeOrderCOD,
   placeOrderStripe,
+  verifyStripe,
   getAllOrders,
   userOrders,
   updateOrderStatus,
@@ -21,5 +22,8 @@ router.post("/place-order-stripe", authenticateUser, placeOrderStripe);
 
 // User Features
 router.post("/user-orders", authenticateUser, userOrders);
+
+//Verify Payment
+router.post("/verify-stripe", authenticateUser, verifyStripe);
 
 module.exports = router;

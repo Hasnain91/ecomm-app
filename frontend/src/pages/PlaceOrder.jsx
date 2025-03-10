@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const {
     backendUrl,
@@ -78,8 +79,27 @@ const PlaceOrder = () => {
             navigate("/orders");
           } else {
             console.log("Error in cod case:", res.data?.error?.message);
-            toast(res.data?.error?.message);
+            toast(res.data?.message);
           }
+          break;
+        }
+
+        case "stripe": {
+          setIsLoading(true);
+          const res = await axios.post(
+            `${backendUrl}/api/order/place-order-stripe`,
+            orderData,
+            { headers: { token } }
+          );
+
+          if (res.data.success) {
+            setIsLoading(false);
+            const { session_url } = res.data;
+            window.location.replace(session_url);
+          } else {
+            toast.error(res.data.message);
+          }
+
           break;
         }
         default:
@@ -246,6 +266,7 @@ const PlaceOrder = () => {
           <div className="w-full text-end mt-8">
             <button
               type="submit"
+              disabled={isLoading}
               className="bg-black text-white px-16 py-3  text-md font-medium cursor-pointer hover:bg-gray-300 hover:text-black"
             >
               PLACE ORDER
