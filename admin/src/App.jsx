@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import AddProduct from "./pages/AddProduct";
 import Home from "./pages/Home";
 import ListProducts from "./pages/ListProducts";
-import Orders from "./pages/Orders";
+import Orders from "./pages/orders";
 import { backendUrl } from "./constants/index";
 import { useEffect } from "react";
 

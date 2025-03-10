@@ -1,4 +1,9 @@
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
+const Stripe = require("stripe");
+
+// STripe Gateway Initialize
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Palcing orders using COD Method
 const placeOrderCOD = async (req, res) => {
@@ -21,7 +26,7 @@ const placeOrderCOD = async (req, res) => {
     await newOrder.save();
 
     // Clear the user cart after the order has been placed
-    await Order.findByIdAndUpdate(userId, { cartData: {} });
+    await User.findByIdAndUpdate(userId, { cartData: {} });
 
     res
       .status(200)
@@ -36,7 +41,15 @@ const placeOrderCOD = async (req, res) => {
 const placeOrderStripe = async (req, res) => {};
 
 // get all orders to display on admin panel
-const getAllOrders = async (req, res) => {};
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({});
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    console.log("Error in getAllOrders controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
 
 // user order data for forntend
 const userOrders = async (req, res) => {
@@ -51,7 +64,17 @@ const userOrders = async (req, res) => {
   }
 };
 // update order status from admin panel
-const updateOrderStatus = async (req, res) => {};
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
+    await Order.findByIdAndUpdate(orderId, { status });
+
+    res.status(200).json({ success: true, message: "Status Updated!!" });
+  } catch (error) {
+    console.log("Error in userOrders controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
 
 module.exports = {
   placeOrderCOD,
