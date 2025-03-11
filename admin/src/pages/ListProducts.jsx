@@ -4,6 +4,14 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { backendUrl, currency } from "../constants";
 import DeleteModal from "../components/DeleteModal";
+import {
+  Delete,
+  DeleteIcon,
+  Trash,
+  Trash2,
+  Trash2Icon,
+  TrashIcon,
+} from "lucide-react";
 
 const ListProducts = ({ token }) => {
   const [productList, setProductList] = useState([]);
@@ -85,9 +93,9 @@ const ListProducts = ({ token }) => {
             </p>
             <p
               onClick={() => handleDeleteClick(prod)}
-              className="text-right md:text-center cursor-pointer text-xl font-bold "
+              className=" mx-auto text-red-400  cursor-pointer text-xl font-bold "
             >
-              X
+              <Trash />
             </p>
           </div>
         ))}

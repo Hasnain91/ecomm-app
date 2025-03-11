@@ -12,7 +12,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  // Validation error states
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -20,12 +19,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Reset errors
     setNameError("");
     setEmailError("");
     setPasswordError("");
 
-    // Validation checks
     let isValid = true;
 
     if (currentState === "Sign Up" && !name.trim()) {

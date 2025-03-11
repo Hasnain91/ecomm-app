@@ -3,6 +3,7 @@ import { assets } from "../assets/assets";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { backendUrl } from "../constants";
+import { LoaderCircle } from "lucide-react";
 
 const AddProduct = ({ token }) => {
   const [image1, setImage1] = useState(false);
@@ -17,10 +18,12 @@ const AddProduct = ({ token }) => {
   const [subcategory, setSubcategory] = useState("Topwear");
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       const formData = new FormData();
 
       formData.append("name", name);
@@ -56,6 +59,8 @@ const AddProduct = ({ token }) => {
     } catch (error) {
       console.log("Error in adding product: ", error);
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -304,9 +309,15 @@ const AddProduct = ({ token }) => {
 
       <button
         type="submit"
-        className=" cursor-pointer w-38 py-3 mt-4 font-medium text-base bg-black text-white"
+        disabled={isLoading}
+        className={`cursor-pointer flex justify-center items-center gap-2 w-45 py-3 mt-4 font-medium text-base bg-black text-white disabled:opacity-30 disabled:cursor-not-allowed`}
       >
-        ADD PRODUCT
+        {isLoading ? "Adding Product" : "ADD PRODUCT"}
+        <LoaderCircle
+          className={`${
+            isLoading ? "size-4 inline-flex animate-spin" : "hidden"
+          }`}
+        />
       </button>
     </form>
   );

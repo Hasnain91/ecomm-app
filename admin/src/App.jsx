@@ -24,7 +24,17 @@ const App = () => {
 
   return (
     <div className="bg-gray-200 min-h-screen">
-      <Toaster />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            fontSize: "20px",
+            borderRadius: "100px",
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
       {token === "" ? (
         <Login setToken={setToken} />
       ) : (
