@@ -17,7 +17,17 @@ import Verify from "./pages/Verify";
 const App = () => {
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
-      <Toaster />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            fontSize: "20px",
+            borderRadius: "100px",
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
       <Navbar />
       <SearchBar />
       <Routes>

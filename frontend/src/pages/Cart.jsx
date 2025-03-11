@@ -2,12 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../constants/index";
 import CartTotal from "../components/CartTotal";
+import DeleteModal from "../components/DeleteModal";
+import toast from "react-hot-toast";
 
 const Cart = () => {
   const { products, currency, cartItems, updateQuantity, navigate } =
     useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -27,7 +31,23 @@ const Cart = () => {
 
       setCartData(tempData);
     }
-  }, [cartItems, products]); // Added products in the dependency array and put everything in the if statemnets, need to look at it in the future
+  }, [cartItems, products]);
+
+  // Function to handle delete confirmation
+  const handleDeleteClick = (item) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  // Function to delete the item
+  const confirmDelete = () => {
+    if (selectedItem) {
+      updateQuantity(selectedItem._id, selectedItem.size, 0);
+      toast.success("Product removed from the cart.");
+    }
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
 
   return (
     <div className="border-t pt-14">
@@ -49,7 +69,7 @@ const Cart = () => {
           return (
             <div
               key={index}
-              className="p-4 border-t border-b text-gray-600 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center  gap-0"
+              className="p-4 border-t border-b text-gray-600 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-0"
             >
               <div className="flex items-start gap-6">
                 <img
@@ -86,11 +106,10 @@ const Cart = () => {
                 type="number"
                 min={1}
                 defaultValue={item.quantity}
-                className="border
-               max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
+                className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
               />
               <img
-                onClick={() => updateQuantity(item._id, item.size, 0)}
+                onClick={() => handleDeleteClick(item)}
                 className="w-4 sm:w-5 mr-4 cursor-pointer"
                 src={assets.bin_icon}
                 alt="Delete Icon"
@@ -114,6 +133,29 @@ const Cart = () => {
           </div>
         </div>
       </div>
+
+      <DeleteModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h2 className="text-xl font-bold tracking-wider mb-4">
+          Confirm Deletion
+        </h2>
+        <p className="text-lg">
+          Are you sure you want to remove this item from the cart?
+        </p>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="px-4 py-2 bg-gray-200 text-lg font-medium hover:bg-gray-300 rounded-md mr-2"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={confirmDelete}
+            className="px-4 py-2 bg-red-500 text-lg font-medium text-white hover:bg-red-600 rounded-md"
+          >
+            Delete
+          </button>
+        </div>
+      </DeleteModal>
     </div>
   );
 };

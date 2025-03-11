@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { assets } from "../constants/index";
 import { Link, NavLink } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
@@ -19,6 +20,7 @@ const Navbar = () => {
     setToken("");
     setCartItems({});
     navigate("/login");
+    toast.success("Logged out.");
   };
 
   return (
