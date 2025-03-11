@@ -107,7 +107,7 @@ const PlaceOrder = () => {
       }
     } catch (error) {
       console.log("Error in placing order (handleSubmit):", error);
-      toast.error(error.data?.response?.message);
+      toast.error(error.response?.data?.message);
     }
   };
 
