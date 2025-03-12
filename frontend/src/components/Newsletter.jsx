@@ -1,11 +1,40 @@
-import React from "react";
-import toast from "react-hot-toast";
+import React, { useContext, useState } from "react";
+import toast, { LoaderIcon } from "react-hot-toast";
+import axios from "axios";
+import { ShopContext } from "../context/ShopContext";
 
 const Newsletter = () => {
-  const handleSubmit = (e) => {
+  const { backendUrl } = useContext(ShopContext);
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // alert("Form Submitted");
-    toast.success("Form Submitted Successfully");
+
+    try {
+      setIsLoading(true);
+      const res = await axios.post(`${backendUrl}/api/newsletter/subscribe`, {
+        email,
+      });
+
+      if (res.data.success) {
+        toast("Subscription successful! Check your email.", {
+          icon: "👏",
+          style: {
+            borderRadius: "10px",
+            fontSize: "22px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+      }
+    } catch (error) {
+      console.log("Error in handleSubmit of newsletter component: ", error);
+      toast.error(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
+      setEmail("");
+    }
   };
 
   return (
@@ -24,15 +53,25 @@ const Newsletter = () => {
       >
         <input
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email "
           className=" w-full flex-1/3 bg-gray-50 outline-none sm:px-6 px-3 py-1.5 sm:py-3"
           required
         />
         <button
           type="submit"
-          className="text-md bg-black text-white sm:px-6 sm:py-3 py-1.5 px-3 hover:cursor-pointer hover:bg-gray-900"
+          disabled={isLoading}
+          className="text-md bg-black text-white sm:px-6 sm:py-3 py-1.5 px-3 disabled:cursor-not-allowed disabled:opacity-40 hover:cursor-pointer hover:bg-gray-900"
         >
-          SUBSCRIBE
+          {isLoading ? (
+            <div className="flex justify-between items-center gap-2">
+              <span className="text-lg">Subscribing</span>
+              <LoaderIcon className="animate-spin size-7" />
+            </div>
+          ) : (
+            "SUBSCRIBE"
+          )}
         </button>
       </form>
     </div>
