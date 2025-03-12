@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState } from "react";
-// import { products } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -13,10 +12,29 @@ const ShopContextProvider = ({ children }) => {
   const backendUrl = baseUrl;
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-  const [cartItems, setCartItems] = useState({});
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem("cart");
+    console.log("Raw Cart Data from Local Storage:", savedCart);
+    return savedCart ? JSON.parse(savedCart) : {};
+  });
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+
+  // load cart from local storage when app initializes
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    console.log("Saved Cart from the local storage: ", savedCart);
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Save cart to local storage whenevr cart is updated
+  useEffect(() => {
+    console.log("Saving cart to the local storage: ", cartItems);
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = async (productId, size) => {
     if (!size) {
@@ -39,22 +57,6 @@ const ShopContextProvider = ({ children }) => {
 
     setCartItems(cartData);
     toast.success("Product added to the cart");
-
-    if (token) {
-      try {
-        await axios.post(
-          `${backendUrl}/api/cart/add`,
-          {
-            productId,
-            size,
-          },
-          { headers: { token } }
-        );
-      } catch (error) {
-        console.log("error in addToCart function in ShopContext: ", error);
-        toast.error(error?.message);
-      }
-    }
   };
 
   const getCartCount = () => {
@@ -77,26 +79,16 @@ const ShopContextProvider = ({ children }) => {
   const updateQuantity = async (itemId, size, quantity) => {
     let cartData = structuredClone(cartItems);
 
-    cartData[itemId][size] = quantity;
+    if (quantity === 0) {
+      delete cartData[itemId][size];
+      if (Object.keys(cartData[itemId]).length === 0) {
+        delete cartData[itemId];
+      }
+    } else {
+      cartData[itemId][size] = quantity;
+    }
 
     setCartItems(cartData);
-
-    if (token) {
-      try {
-        await axios.post(
-          `${backendUrl}/api/cart/update`,
-          {
-            itemId,
-            size,
-            quantity,
-          },
-          { headers: { token } }
-        );
-      } catch (error) {
-        console.log("Error in updateQuantity: ", error);
-        toast.error(error?.message);
-      }
-    }
   };
 
   const getCartAmount = () => {
@@ -133,23 +125,6 @@ const ShopContextProvider = ({ children }) => {
     }
   };
 
-  const getUserCart = async (token) => {
-    try {
-      const res = await axios.post(
-        `${backendUrl}/api/cart/get`,
-        {},
-        { headers: { token } }
-      );
-
-      if (res.data.success) {
-        setCartItems(res.data.cartData);
-      }
-    } catch (error) {
-      console.log("Error in getUserCart: ", error);
-      toast.error(error?.message);
-    }
-  };
-
   useEffect(() => {
     getProductsData();
   }, []);
@@ -157,7 +132,6 @@ const ShopContextProvider = ({ children }) => {
   useEffect(() => {
     if (!token && localStorage.getItem("token")) {
       setToken(localStorage.getItem("token"));
-      getUserCart(localStorage.getItem("token"));
     }
   }, []);
 

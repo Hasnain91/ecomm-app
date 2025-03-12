@@ -40,6 +40,12 @@ const PlaceOrder = () => {
 
   const handlesSubmit = async (e) => {
     e.preventDefault();
+
+    if (!token) {
+      navigate("/login");
+      toast.error("Please log in to place your order");
+      return;
+    }
     try {
       let orderItems = [];
 
@@ -76,6 +82,7 @@ const PlaceOrder = () => {
           if (res.data.success) {
             toast.success(res.data.message);
             setCartItems({});
+            localStorage.removeItem("cart");
             navigate("/orders");
           } else {
             console.log("Error in cod case:", res.data?.error?.message);
@@ -95,6 +102,8 @@ const PlaceOrder = () => {
           if (res.data.success) {
             setIsLoading(false);
             const { session_url } = res.data;
+            setCartItems({});
+            localStorage.removeItem("cart");
             window.location.replace(session_url);
           } else {
             toast.error(res.data.message);
