@@ -86,6 +86,7 @@ const ShopContextProvider = ({ children }) => {
       }
     } else {
       cartData[itemId][size] = quantity;
+      toast.success("Cart Updated");
     }
 
     setCartItems(cartData);
