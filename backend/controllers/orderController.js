@@ -1,6 +1,16 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
 const Stripe = require("stripe");
+const nodemailer = require("nodemailer");
+
+// Nodemailer transporter configure
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 const currency = "usd";
 const deliveryCharges = 10;
@@ -30,6 +40,49 @@ const placeOrderCOD = async (req, res) => {
 
     // Clear the user cart after the order has been placed
     await User.findByIdAndUpdate(userId, { cartData: {} });
+
+    // Send confirmation email for COD
+    const mailOptions = {
+      from: `"FOREVER" <${process.env.EMAIL_USER}>`,
+      to: address.email, // User's email from the address object
+      subject: "Order Confirmation - Cash on Delivery",
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Order Confirmation</title>
+        </head>
+        <body>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1>Thank You for Your Order!</h1>
+            <p>Hello ${address.firstName} ${address.lastName},</p>
+            <p>We have received your order and it will be delivered to:</p>
+            <p><strong>Address:</strong> ${address.street}, ${address.city}, ${
+        address.state
+      }, ${address.zipcode}, ${address.country}</p>
+            <p><strong>Phone:</strong> ${address.phone}</p>
+            <p>Your payment method is <strong>Cash on Delivery</strong>. Payment will be collected upon delivery.</p>
+            <h3>Order Details:</h3>
+            <ul>
+              ${items
+                .map(
+                  (item) =>
+                    `<li>${item.name} (${item.size}) x ${item.quantity}</li>`
+                )
+                .join("")}
+            </ul>
+            <p><strong>Total Amount:</strong> $${amount}</p>
+            <p>If you have any questions, feel free to contact us at <a href="mailto:support@forever.com">support@forever.com</a>.</p>
+            <p>Best regards,<br>FOREVER Shop</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res
       .status(200)
@@ -89,6 +142,48 @@ const placeOrderStripe = async (req, res) => {
       line_items,
       mode: "payment",
     });
+
+    // Send confirmation email for Stripe
+    const mailOptions = {
+      from: `"FOREVER" <${process.env.EMAIL_USER}>`,
+      to: address.email, // User's email from the address object
+      subject: "Order Confirmation - Payment Received",
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Order Confirmation</title>
+        </head>
+        <body>
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1>Thank You for Your Order!</h1>
+            <p>Hello ${address.firstName} ${address.lastName},</p>
+            <p>We have received your payment and your order will be delivered to:</p>
+            <p><strong>Address:</strong> ${address.street}, ${address.city}, ${
+        address.state
+      }, ${address.zipcode}, ${address.country}</p>
+            <p><strong>Phone:</strong> ${address.phone}</p>
+            <p>Your payment of <strong>$${amount}</strong> has been successfully processed.</p>
+            <h3>Order Details:</h3>
+            <ul>
+              ${items
+                .map(
+                  (item) =>
+                    `<li>${item.name} (${item.size}) x ${item.quantity}</li>`
+                )
+                .join("")}
+            </ul>
+            <p>If you have any questions, feel free to contact us at <a href="mailto:support@your-website.com">support@FOREVER-shop.com</a>.</p>
+            <p>Best regards,<br>FOREVER Shop</p>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res.status(200).json({ success: true, session_url: session.url });
   } catch (error) {

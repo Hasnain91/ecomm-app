@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Loader2, LoaderIcon } from "lucide-react";
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -47,6 +48,7 @@ const PlaceOrder = () => {
       return;
     }
     try {
+      setIsLoading(true);
       let orderItems = [];
 
       for (const items in cartItems) {
@@ -117,6 +119,8 @@ const PlaceOrder = () => {
     } catch (error) {
       console.log("Error in placing order (handleSubmit):", error);
       toast.error(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -276,9 +280,16 @@ const PlaceOrder = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-black text-white px-16 py-3  text-md font-medium cursor-pointer hover:bg-gray-300 hover:text-black"
+              className="bg-black text-white px-16 py-3  text-md font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-300 hover:text-black"
             >
-              PLACE ORDER
+              <div className="flex justify-between items-center">
+                PLACE ORDER
+                <Loader2
+                  className={`${
+                    isLoading ? "size-7 inline-flex animate-spin" : "hidden"
+                  }`}
+                />
+              </div>
             </button>
           </div>
         </div>

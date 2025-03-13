@@ -1,7 +1,5 @@
 const express = require("express");
-const {
-  subscribeToNewsletter,
-} = require("../controllers/newslettercontroller");
+const { subscribeToNewsletter } = require("../controllers/mailController");
 
 const router = express.Router();
 

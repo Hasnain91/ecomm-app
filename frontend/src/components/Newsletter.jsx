@@ -13,7 +13,7 @@ const Newsletter = () => {
 
     try {
       setIsLoading(true);
-      const res = await axios.post(`${backendUrl}/api/newsletter/subscribe`, {
+      const res = await axios.post(`${backendUrl}/api/mail/subscribe`, {
         email,
       });
 

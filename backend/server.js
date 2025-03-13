@@ -6,7 +6,7 @@ const connectCloudinary = require("./config/cloudinary");
 const userRoutes = require("./routes/userRoutes.js");
 const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
-const newsletterRoute = require("./routes/newsletterRoute.js");
+const newsletterRoute = require("./routes/mailRoutes.js");
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ app.use(cors());
 app.use("/api/user", userRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
-app.use("/api/newsletter", newsletterRoute);
+app.use("/api/mail", newsletterRoute);
 
 app.get("/", (req, res) => {
   res.send("API is working");

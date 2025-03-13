@@ -1,4 +1,3 @@
-const { text } = require("express");
 const nodemailer = require("nodemailer");
 
 // Nodemailer transporter configure
