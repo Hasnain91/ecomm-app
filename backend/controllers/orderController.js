@@ -38,9 +38,6 @@ const placeOrderCOD = async (req, res) => {
 
     await newOrder.save();
 
-    // Clear the user cart after the order has been placed
-    await User.findByIdAndUpdate(userId, { cartData: {} });
-
     // Send confirmation email for COD
     const mailOptions = {
       from: `"FOREVER" <${process.env.EMAIL_USER}>`,
@@ -199,7 +196,6 @@ const verifyStripe = async (req, res) => {
   try {
     if (success === "true") {
       await Order.findByIdAndUpdate(orderId, { payment: true });
-      await User.findByIdAndUpdate(userId, { cartData: {} });
       res.status(200).json({ success: true });
     } else {
       await Order.findByIdAndDelete(orderId);
