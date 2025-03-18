@@ -6,6 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Loader2, LoaderIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
@@ -32,6 +33,26 @@ const PlaceOrder = () => {
     phone: "",
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset,
+  } = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      street: "",
+      city: "",
+      state: "",
+      zipcode: "",
+      country: "",
+      phone: "",
+    },
+  });
+
   const handleChange = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -39,16 +60,23 @@ const PlaceOrder = () => {
     setFormData((data) => ({ ...data, [name]: [value] }));
   };
 
-  const handlesSubmit = async (e) => {
-    e.preventDefault();
-
+  const handlesSubmit = async (data) => {
     if (!token) {
       navigate("/login");
       toast.error("Please log in to place your order");
       return;
     }
     try {
-      setIsLoading(true);
+      if (
+        !data.firstName ||
+        !data.lastName ||
+        !data.email ||
+        !data.street ||
+        !data.city ||
+        !data.country ||
+        !data.phone
+      )
+        return;
       let orderItems = [];
 
       for (const items in cartItems) {

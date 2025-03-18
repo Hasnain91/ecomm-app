@@ -4,14 +4,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { backendUrl, currency } from "../constants";
 import DeleteModal from "../components/DeleteModal";
-import {
-  Delete,
-  DeleteIcon,
-  Trash,
-  Trash2,
-  Trash2Icon,
-  TrashIcon,
-} from "lucide-react";
+import { Trash } from "lucide-react";
 
 const ListProducts = ({ token }) => {
   const [productList, setProductList] = useState([]);
