@@ -63,8 +63,32 @@ const addProduct = async (req, res) => {
 // get all Products
 const listProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
-    res.status(200).json({ success: true, products });
+    const { q, page = 1, limit = 10 } = req.query;
+    let query = {};
+
+    if (q) {
+      query = {
+        $or: [
+          { name: { $regex: q, $options: "i" } },
+          { category: { $regex: q, $options: "i" } },
+        ],
+      };
+    }
+
+    let skip = (page - 1) * limit;
+
+    if (skip < 0) skip = 0;
+
+    const products = await Product.find(query).skip(skip).limit(Number(limit));
+
+    const totalProducts = await Product.countDocuments(query);
+    res.status(200).json({
+      success: true,
+      products,
+      totalProducts,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalProducts / limit),
+    });
   } catch (error) {
     console.log("Error in listProducts controller: ", error);
     res.status(500).json({ success: false, message: error?.message });
