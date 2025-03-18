@@ -144,13 +144,13 @@ const Cart = () => {
         <div className="flex justify-end mt-4">
           <button
             onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 bg-gray-200 text-lg font-medium hover:bg-gray-300 rounded-md mr-2"
+            className="px-4 py-2 bg-gray-200 text-lg font-medium cursor-pointer hover:bg-gray-300 rounded-md mr-2"
           >
             Cancel
           </button>
           <button
             onClick={confirmDelete}
-            className="px-4 py-2 bg-red-500 text-lg font-medium text-white hover:bg-red-600 rounded-md"
+            className="px-4 py-2 bg-red-500 text-lg font-medium cursor-pointer text-white hover:bg-red-600 rounded-md"
           >
             Delete
           </button>

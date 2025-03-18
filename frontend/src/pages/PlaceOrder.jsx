@@ -5,12 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Loader2, LoaderIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const {
     backendUrl,
@@ -21,62 +20,20 @@ const PlaceOrder = () => {
     delivery_fee,
     products,
   } = useContext(ShopContext);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
-    phone: "",
-  });
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    watch,
-    reset,
-  } = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      street: "",
-      city: "",
-      state: "",
-      zipcode: "",
-      country: "",
-      phone: "",
-    },
-  });
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-  const handleChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setFormData((data) => ({ ...data, [name]: [value] }));
-  };
-
-  const handlesSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     if (!token) {
       navigate("/login");
       toast.error("Please log in to place your order");
       return;
     }
+
     try {
-      if (
-        !data.firstName ||
-        !data.lastName ||
-        !data.email ||
-        !data.street ||
-        !data.city ||
-        !data.country ||
-        !data.phone
-      )
-        return;
       let orderItems = [];
 
       for (const items in cartItems) {
@@ -101,7 +58,6 @@ const PlaceOrder = () => {
       };
 
       switch (paymentMethod) {
-        //API call for cash on delivery
         case "cod": {
           const res = await axios.post(
             `${backendUrl}/api/order/place-order-cod`,
@@ -115,14 +71,12 @@ const PlaceOrder = () => {
             localStorage.removeItem("cart");
             navigate("/orders");
           } else {
-            console.log("Error in cod case:", res.data?.error?.message);
-            toast(res.data?.message);
+            console.log("Error in COD case:", res.data?.error?.message);
+            toast.error(res.data?.message);
           }
           break;
         }
-
         case "stripe": {
-          setIsLoading(true);
           const res = await axios.post(
             `${backendUrl}/api/order/place-order-stripe`,
             orderData,
@@ -130,7 +84,6 @@ const PlaceOrder = () => {
           );
 
           if (res.data.success) {
-            setIsLoading(false);
             const { session_url } = res.data;
             setCartItems({});
             localStorage.removeItem("cart");
@@ -138,23 +91,21 @@ const PlaceOrder = () => {
           } else {
             toast.error(res.data.message);
           }
-
           break;
         }
+
         default:
           break;
       }
     } catch (error) {
       console.log("Error in placing order (handleSubmit):", error);
       toast.error(error.response?.data?.message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <form
-      onSubmit={handlesSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
     >
       {/* LEFT Side */}
@@ -170,91 +121,99 @@ const PlaceOrder = () => {
         </div>
         <div className="flex gap-3">
           <input
-            required
-            onChange={handleChange}
-            name="firstName"
-            value={formData.firstName}
+            {...register("firstName", { required: "First Name is required" })}
             type="text"
             placeholder="First Name"
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           />
           <input
-            required
-            onChange={handleChange}
-            name="lastName"
-            value={formData.lastName}
+            {...register("lastName", { required: "Last Name is required" })}
             type="text"
             placeholder="Last Name"
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           />
         </div>
+        <div className="flex justify-between">
+          {errors.firstName && (
+            <p className="text-red-500">{errors.firstName.message}</p>
+          )}
+          {errors.lastName && (
+            <p className="text-red-500 ">{errors.lastName.message}</p>
+          )}
+        </div>
+
         <input
-          required
-          onChange={handleChange}
-          name="email"
-          value={formData.email}
+          {...register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Please enter a valid email address",
+            },
+          })}
           type="email"
           placeholder="Email Address"
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
         />
+        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+
         <input
-          required
-          onChange={handleChange}
-          name="street"
-          value={formData.street}
+          {...register("street", { required: "Street Address is required" })}
           type="text"
           placeholder="Street Address"
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
         />
+        {errors.street && (
+          <p className="text-red-500">{errors.street.message}</p>
+        )}
+
         <div className="flex gap-3">
           <input
-            required
-            onChange={handleChange}
-            name="city"
-            value={formData.city}
+            {...register("city", { required: "City is required" })}
             type="text"
             placeholder="City"
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           />
           <input
-            required
-            onChange={handleChange}
-            name="state"
-            value={formData.state}
+            {...register("state", { required: false })}
             type="text"
-            placeholder="State"
+            placeholder="State (Optional)"
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           />
         </div>
+        {errors.city && <p className="text-red-500">{errors.city.message}</p>}
+        {errors.state && <p className="text-red-500">{errors.state.message}</p>}
         <div className="flex gap-3">
           <input
-            required
-            onChange={handleChange}
-            name="zipcode"
-            value={formData.zipcode}
-            type="number"
-            placeholder="Zip Code"
-            className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
-          />
-          <input
-            required
-            onChange={handleChange}
-            name="country"
-            value={formData.country}
+            {...register("country", { required: "Country is required" })}
             type="text"
             placeholder="Country"
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           />
+          <input
+            {...register("zipcode", {
+              required: false,
+            })}
+            type="number"
+            placeholder="Zip Code (Optional)"
+            className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+          />
         </div>
+        {errors.zipcode && (
+          <p className="text-red-500">{errors.zipcode.message}</p>
+        )}
+        {errors.country && (
+          <p className="text-red-500">{errors.country.message}</p>
+        )}
+
         <input
-          required
-          onChange={handleChange}
-          name="phone"
-          value={formData.phone}
+          {...register("phone", {
+            required: "Phone number is required",
+          })}
           type="number"
           placeholder="Phone"
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
         />
+        {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
       </div>
 
       {/* RIGHT Side */}
@@ -307,14 +266,14 @@ const PlaceOrder = () => {
           <div className="w-full text-end mt-8">
             <button
               type="submit"
-              disabled={isLoading}
-              className="bg-black text-white px-16 py-3  text-md font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-300 hover:text-black"
+              disabled={isSubmitting}
+              className="bg-black text-white px-16 py-3 text-md font-medium cursor-pointer disabled:cursor-not-allowed disabled:opacity-40 hover:bg-gray-300 hover:text-black"
             >
-              <div className="flex justify-between items-center">
-                PLACE ORDER
+              <div className="flex justify-between items-center gap-3 ">
+                {isSubmitting ? "Placing Order" : "PLACE ORDER"}
                 <Loader2
                   className={`${
-                    isLoading ? "size-7 inline-flex animate-spin" : "hidden"
+                    isSubmitting ? "size-7 inline-flex animate-spin" : "hidden"
                   }`}
                 />
               </div>
