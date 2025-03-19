@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { backendUrl } from "../constants";
 import DeleteModal from "../components/DeleteModal";
@@ -7,6 +8,8 @@ import { Trash } from "lucide-react";
 import Pagination from "../components/Pagination";
 
 const ListProducts = ({ token }) => {
+  const navigate = useNavigate();
+
   const [productList, setProductList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -100,6 +103,14 @@ const ListProducts = ({ token }) => {
           onChange={(e) => setSearchTerm(e.target.value)} // Update search term
           className="px-4 py-2 border bg-gray-50 border-gray-300 rounded-md w-96 focus:outline-none focus:shadow-2xl focus:shadow-gray-500 focus:border-gray-500 transition"
         />
+
+        <button
+          onClick={() => navigate("/add-product")}
+          className="
+          bg-gray-900 text-gray-100 px-3 py-2 cursor-pointer rounded hover:opacity-70"
+        >
+          Add Product
+        </button>
       </div>
 
       <div className="flex flex-col gap-2">

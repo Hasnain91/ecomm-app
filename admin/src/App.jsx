@@ -11,6 +11,7 @@ import Orders from "./pages/orders";
 import { useEffect } from "react";
 
 const App = () => {
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const loadToken = localStorage.getItem("token")
     ? localStorage.getItem("token")
     : "";
