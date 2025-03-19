@@ -13,8 +13,34 @@ import Login from "./pages/Login";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import Verify from "./pages/Verify";
+import { backendUrl } from "../../admin/src/constants";
+
+import io from "socket.io-client";
+import { useContext, useEffect } from "react";
+import { ShopContext } from "./context/ShopContext";
+
+const socket = io(backendUrl);
 
 const App = () => {
+  const { token, setToken, user } = useContext(ShopContext);
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.emit("join", user._id); // ✅ Join user's own room
+
+      socket.on("forceLogout", (data) => {
+        alert(data.message);
+        setToken(null);
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // ✅ Redirect to login page
+        toast.success("yesSs" + data?.message);
+      });
+    }
+
+    return () => {
+      socket.off("forceLogout");
+    };
+  }, [user?._id]);
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Toaster

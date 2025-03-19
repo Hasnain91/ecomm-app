@@ -41,6 +41,30 @@ const Users = ({ token }) => {
     fetchAllUsers();
   }, [token]);
 
+  const handleUserStatusChange = async (e, userId) => {
+    try {
+      const status = e.target.value;
+      const res = await axios.post(
+        `${backendUrl}/api/user/update-status`,
+        {
+          userId,
+          status,
+        },
+        { headers: { token } }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+        fetchAllUsers();
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log("Error in fetchAllUsers:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch users");
+    }
+  };
+
   return (
     <div>
       <h3 className="text-xl sm:text-2xl font-semibold mb-6">Users</h3>
@@ -68,12 +92,12 @@ const Users = ({ token }) => {
               </div>
 
               <select
-                // value={user.status || "Active"}
-                // onChange={(e) => handleUserStatusChange(e, user._id)}
+                value={user.status || "Active"}
+                onChange={(e) => handleUserStatusChange(e, user._id)}
                 className="p-2 w-[30%] font-semibold bg-gray-100 outline-none"
               >
                 <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                {/* <option value="Inactive">Inactive</option> */}
                 <option value="Suspended">Suspended</option>
               </select>
             </div>

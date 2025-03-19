@@ -47,6 +47,7 @@ const Login = () => {
       if (res.data.success) {
         setToken(res.data.token);
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.userId);
         toast.success(
           currentState === "Sign Up"
             ? "Registration Successful"

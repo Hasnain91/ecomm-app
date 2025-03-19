@@ -1,7 +1,8 @@
-const User = require("../models/userModel");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
+const { getIo } = require("../config/socket"); // Import the socket instance
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET);
@@ -80,13 +81,25 @@ const loginUser = async (req, res) => {
         .json({ success: false, message: "User Not Found" });
     }
 
+    //Check user status
+    if (user.status === "Suspended") {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Your account is blocked, please contact admin for further details.",
+      });
+    }
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
       const token = generateToken(user._id);
-      return res
-        .status(200)
-        .json({ success: true, message: "Login Successful", token });
+      return res.status(200).json({
+        success: true,
+        message: "Login Successful",
+        token,
+        userId: user.id,
+      });
     } else {
       return res
         .status(401)
@@ -117,8 +130,13 @@ const getUsers = async (req, res) => {
 const updateUserStatus = async (req, res) => {
   try {
     const { userId, status } = req.body;
-    const user = await User.findById(userId);
 
+    // Validate input
+    if (!userId || !status) {
+      return res.status(400).json({ success: false, message: "Invalid input" });
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
       return res
         .status(404)
@@ -128,7 +146,13 @@ const updateUserStatus = async (req, res) => {
     user.status = status;
     await user.save();
 
-    res.status(200).json({ success: false, message: "User Status Updated!" });
+    // Notify user via WebSocket
+    const io = getIo();
+    io.to(userId).emit("forceLogout", {
+      message: "Your account status has changed. Please log in again.",
+    });
+
+    res.status(200).json({ success: true, message: "User Status Updated!" });
   } catch (error) {
     console.log("Error in updateUserStatus Controller: ", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });

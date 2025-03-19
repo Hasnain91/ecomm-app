@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ const ShopContextProvider = ({ children }) => {
   });
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState("");
+  const [socket, setSocket] = useState(null);
   const navigate = useNavigate();
 
   // load cart from local storage when app initializes
@@ -29,6 +31,31 @@ const ShopContextProvider = ({ children }) => {
       setCartItems(JSON.parse(savedCart));
     }
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      const newSocket = io(backendUrl);
+      setSocket(newSocket);
+
+      // Emit user ID to join the room
+      newSocket.emit("join", localStorage.getItem("userId"));
+
+      // Listen for force logout
+      newSocket.on("forceLogout", (data) => {
+        toast.error(data.message);
+        logout();
+      });
+
+      return () => newSocket.disconnect();
+    }
+  }, [token]);
+
+  const logout = () => {
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    window.location.href = "/login";
+  };
 
   // Save cart to local storage whenevr cart is updated
   useEffect(() => {
@@ -154,6 +181,7 @@ const ShopContextProvider = ({ children }) => {
     backendUrl,
     token,
     setToken,
+    logout,
   };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
