@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Users } from "lucide-react";
+import { Users, ShoppingBag, Package } from "lucide-react";
 import { assets } from "../assets/assets";
 const Sidebar = () => {
   return (
@@ -15,7 +15,8 @@ const Sidebar = () => {
             }`
           }
         >
-          <img className="size-5" src={assets.order_icon} alt="" />
+          {/* <img className="size-5" src={assets.order_icon} alt="" /> */}
+          <ShoppingBag className="size-5" />
           <p className="hidden md:block">List Items</p>
         </NavLink>
         <NavLink
@@ -28,7 +29,8 @@ const Sidebar = () => {
             }`
           }
         >
-          <img className="size-5" src={assets.order_icon} alt="" />
+          {/* <img className="size-5" src={assets.order_icon} alt="" /> */}
+          <Package className="size-5" />
           <p className="hidden md:block">Orders</p>
         </NavLink>
         <NavLink

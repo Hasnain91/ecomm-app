@@ -9,6 +9,7 @@ import AddProduct from "./pages/AddProduct";
 import ListProducts from "./pages/ListProducts";
 import Orders from "./pages/orders";
 import { useEffect } from "react";
+import Users from "./pages/Users";
 
 const App = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -53,6 +54,7 @@ const App = () => {
                   element={<ListProducts token={token} />}
                 />
                 <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="/users" element={<Users token={token} />} />
               </Routes>
             </div>
           </div>

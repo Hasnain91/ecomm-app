@@ -98,6 +98,43 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get All Users
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select(" -password");
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.log("Error in getUsers Controller: ", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+//Update User Status
+const updateUserStatus = async (req, res) => {
+  try {
+    const { userId, status } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not Found!" });
+    }
+
+    user.status = status;
+    await user.save();
+
+    res.status(200).json({ success: false, message: "User Status Updated!" });
+  } catch (error) {
+    console.log("Error in updateUserStatus Controller: ", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 // Admin Login
 const adminLogin = async (req, res) => {
   try {
@@ -124,4 +161,10 @@ const adminLogin = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, registerUser, adminLogin };
+module.exports = {
+  loginUser,
+  registerUser,
+  adminLogin,
+  getUsers,
+  updateUserStatus,
+};
