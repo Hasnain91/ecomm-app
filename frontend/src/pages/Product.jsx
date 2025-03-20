@@ -1,15 +1,22 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
 import { assets } from "../constants/index";
 import RelatedProducts from "../components/RelatedProducts";
+import toast from "react-hot-toast";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const dispatch = useDispatch();
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
+
+  // const { products, currency, addToCart } = useContext(ShopContext);
+  // Access global state using `useSelector`
+  const products = useSelector((state) => state.products.list);
+  const currency = useSelector((state) => state.config.currency);
 
   const fetchProductData = async () => {
     products.map((product) => {
@@ -24,6 +31,21 @@ const Product = () => {
   useEffect(() => {
     fetchProductData();
   }, [productId, products]);
+
+  const handleAddToCart = () => {
+    if (!size) {
+      toast.error("Please select a size first.");
+      return;
+    }
+    dispatch({
+      type: "cart/addToCart",
+      payload: { productId: productData._id, size, price: productData.price },
+    });
+  };
+
+  if (!productData) {
+    return <div className="opacity-0"></div>;
+  }
 
   return productData ? (
     <div className="border-t-2 pt-10 transition-opacity ease-in-out duration-500 opacity-100">
@@ -81,7 +103,8 @@ const Product = () => {
             </div>
           </div>
           <button
-            onClick={() => addToCart(productData?._id, size)}
+            // onClick={() => addToCart(productData?._id, size)}
+            onClick={handleAddToCart}
             className="bg-black text-white px-8 py-3 cursor-pointer transition-colors duration-200 ease-in hover:text-black hover:bg-gray-100"
           >
             ADD TO CART

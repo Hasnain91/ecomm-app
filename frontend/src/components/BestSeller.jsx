@@ -1,10 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext";
-import { Link } from "react-router-dom";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector } from "react-redux";
+
 import ProductItem from "./ProductItem";
 
 const BestSeller = () => {
-  const { products, currency } = useContext(ShopContext);
+  // const { products, currency } = useContext(ShopContext);
+  // Access products and currency from Redux state
+  const products = useSelector((state) => state.products.list);
+  const currency = useSelector((state) => state.config.currency);
   const [bestSellers, setBestSellers] = useState([]);
 
   useEffect(() => {

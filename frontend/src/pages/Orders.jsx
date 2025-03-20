@@ -1,10 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
+
 import toast from "react-hot-toast";
 import axios from "axios";
+import { baseUrl } from "../constants";
 
 const Orders = () => {
-  const { currency, backendUrl, token } = useContext(ShopContext);
+  const dispatch = useDispatch();
+  const currency = useSelector((state) => state.config.currency);
+  const token = useSelector((state) => state.auth.token);
   const [orders, setOrders] = useState([]);
 
   const fetchOrders = async () => {
@@ -14,12 +18,11 @@ const Orders = () => {
       }
 
       const res = await axios.post(
-        `${backendUrl}/api/order/user-orders`,
+        `${baseUrl}/api/order/user-orders`,
         {},
         { headers: { token } }
       );
 
-      // console.log("Response for fetching orders: ", res.data);
       if (res.data.success) {
         let allOrders = [];
         res.data.orders.map((order) => {

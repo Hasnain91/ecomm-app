@@ -1,12 +1,18 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import { ShopContext } from "../context/ShopContext";
+import { baseUrl } from "../constants";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [currentState, setCurrentState] = React.useState("Login");
-  const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
+  const [currentState, setCurrentState] = useState("Login");
+  // const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
+  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -32,20 +38,21 @@ const Login = () => {
 
       let res;
       if (currentState === "Sign Up") {
-        res = await axios.post(`${backendUrl}/api/user/register`, {
+        res = await axios.post(`${baseUrl}/api/user/register`, {
           name: data.name,
           email: data.email,
           password: data.password,
         });
       } else {
-        res = await axios.post(`${backendUrl}/api/user/login`, {
+        res = await axios.post(`${baseUrl}/api/user/login`, {
           email: data.email,
           password: data.password,
         });
       }
 
       if (res.data.success) {
-        setToken(res.data.token);
+        // setToken(res.data.token);
+        dispatch({ type: "auth/setToken", payload: res.data.token });
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userId", res.data.userId);
         toast.success(

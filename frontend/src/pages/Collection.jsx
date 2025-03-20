@@ -1,7 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector } from "react-redux";
+
 import { assets } from "../constants/index";
+
 import ProductItem from "../components/ProductItem";
 
 const Collection = () => {
@@ -13,7 +16,11 @@ const Collection = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(20);
 
-  const { products, search, showSearch } = useContext(ShopContext);
+  // const { products, search, showSearch } = useContext(ShopContext);
+  // Access global state using `useSelector`
+  const products = useSelector((state) => state.products.list);
+  const search = useSelector((state) => state.search.search);
+  const showSearch = useSelector((state) => state.search.showSearch);
 
   const toggleCategoryFilter = (e) => {
     if (categoryFilter.includes(e.target.value)) {
@@ -82,14 +89,6 @@ const Collection = () => {
   useEffect(() => {
     sortPoducts();
   }, [sortType]);
-
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-
-  const currentProducts = filterProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t ">
@@ -206,7 +205,7 @@ const Collection = () => {
 
         {/* Show all products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {currentProducts?.map((product, index) => (
+          {products?.map((product, index) => (
             <ProductItem
               key={index}
               id={product?._id}
@@ -218,25 +217,6 @@ const Collection = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center gap-3 mt-10">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <CircleChevronLeft size={25} />
-          </button>
-          <span className="px-4 py-2 bg-gray-200 font-bold text-gray-700 rounded-full">
-            {currentPage}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={indexOfLastProduct >= filterProducts.length}
-            className=" disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <CircleChevronRight size={25} />
-          </button>
-        </div>
       </div>
     </div>
   );

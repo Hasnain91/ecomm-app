@@ -1,9 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector } from "react-redux";
+
 import ProductItem from "./ProductItem";
 
 const RelatedProducts = ({ category, type }) => {
-  const { products } = useContext(ShopContext);
+  // const { products } = useContext(ShopContext);
+  const products = useSelector((state) => state.products.list);
+
   const [relatedProd, setRelatedProd] = useState([]);
 
   useEffect(() => {

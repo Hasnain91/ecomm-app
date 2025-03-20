@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext";
-// import Title from "./Title";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector } from "react-redux";
+
 import ProductItem from "./ProductItem";
-import { Link } from "react-router-dom";
 
 const LatestCollection = () => {
-  const { products } = useContext(ShopContext);
+  // const { products } = useContext(ShopContext);
+  const products = useSelector((state) => state.products.list);
+
   const [latestProducts, setLatestProducts] = useState([]);
 
   useEffect(() => {

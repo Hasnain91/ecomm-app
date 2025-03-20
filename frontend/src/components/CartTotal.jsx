@@ -1,8 +1,15 @@
-import React, { useContext } from "react";
-import { ShopContext } from "../context/ShopContext";
+import { useSelector } from "react-redux";
+import { getCartAmount } from "../redux/features/cartSlice";
 
 const CartTotal = () => {
-  const { currency, delivery_fee, getCartAmount } = useContext(ShopContext);
+  const currency = useSelector((state) => state.config.currency);
+  const delivery_fee = useSelector((state) => state.config.deliveryFee);
+  const cartItems = useSelector((state) => state.cart.cartItems);
+  const products = useSelector((state) => state.products.list);
+
+  const cartTotal = useSelector((state) =>
+    getCartAmount(state, state.products.list)
+  );
 
   return (
     <div className="w-full">
@@ -20,7 +27,8 @@ const CartTotal = () => {
           <p>Subtotal</p>
           <p>
             {currency}
-            {getCartAmount()}.00
+
+            {cartTotal ? cartTotal.toFixed(2) : "0.00"}
           </p>
         </div>
         <hr />
@@ -35,7 +43,7 @@ const CartTotal = () => {
           <b>Total</b>
           <b>
             {currency}
-            {getCartAmount() === 0 ? 0 : getCartAmount() + delivery_fee}.00
+            {(cartTotal || 0) + delivery_fee}.00
           </b>
         </div>
       </div>
@@ -44,3 +52,18 @@ const CartTotal = () => {
 };
 
 export default CartTotal;
+
+// Function to calculate the total cart amount
+// const getCartAmount = () => {
+//   let totalAmount = 0;
+//   for (const productId in cartItems) {
+//     const product = Object.values(cartItems[productId]);
+//     product.forEach(({ quantity, price }) => {
+//       totalAmount += price * quantity;
+//     });
+//   }
+//   return totalAmount;
+// };
+
+// const { currency, delivery_fee, getCartAmount } = useContext(ShopContext);
+// Access global state using `useSelector`

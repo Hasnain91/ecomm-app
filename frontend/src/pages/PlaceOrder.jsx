@@ -1,8 +1,10 @@
 import React, { useContext, useState } from "react";
 import CartTotal from "../components/CartTotal";
-import { assets } from "../constants/index";
+import { assets, baseUrl } from "../constants/index";
 import { useNavigate } from "react-router-dom";
-import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
+
+// import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -11,15 +13,35 @@ import { useForm } from "react-hook-form";
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const navigate = useNavigate();
-  const {
-    backendUrl,
-    token,
-    cartItems,
-    setCartItems,
-    getCartAmount,
-    delivery_fee,
-    products,
-  } = useContext(ShopContext);
+  const dispatch = useDispatch();
+  // const {
+  //   token,
+  //   cartItems,
+  //   setCartItems,
+  //   getCartAmount,
+  //   delivery_fee,
+  //   products,
+  // } = useContext(ShopContext);
+  // Access global state using `useSelector`
+  const token = useSelector((state) => state.auth.token);
+  const cartItems = useSelector((state) => state.cart.cartItems);
+  const products = useSelector((state) => state.products.list);
+  const delivery_fee = useSelector((state) => state.config.deliveryFee);
+  // // Calculate cart amount using Redux state
+  const getCartAmount = (cartItems, products) => {
+    let totalAmount = 0;
+
+    for (const productId in cartItems) {
+      const product = products[productId]; // Access product directly by ID
+      if (!product) continue;
+
+      for (const size in cartItems[productId]) {
+        totalAmount += product.price * cartItems[productId][size];
+      }
+    }
+
+    return totalAmount;
+  };
   const {
     register,
     handleSubmit,
@@ -36,15 +58,15 @@ const PlaceOrder = () => {
     try {
       let orderItems = [];
 
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
+      for (const productId in cartItems) {
+        for (const size in cartItems[productId]) {
+          if (cartItems[productId][size] > 0) {
             const itemInfo = structuredClone(
-              products.find((product) => product._id === items)
+              products.find((product) => product._id === productId)
             );
             if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItems[items][item];
+              itemInfo.size = size;
+              itemInfo.quantity = cartItems[productId][size];
               orderItems.push(itemInfo);
             }
           }
@@ -54,20 +76,20 @@ const PlaceOrder = () => {
       let orderData = {
         address: formData,
         items: orderItems,
-        amount: getCartAmount() + delivery_fee,
+        amount: getCartAmount(cartItems, products) + delivery_fee,
       };
 
       switch (paymentMethod) {
         case "cod": {
           const res = await axios.post(
-            `${backendUrl}/api/order/place-order-cod`,
+            `${baseUrl}/api/order/place-order-cod`,
             orderData,
             { headers: { token } }
           );
 
           if (res.data.success) {
             toast.success(res.data.message);
-            setCartItems({});
+            dispatch({ type: "cart/clearCart" }); // Clear cart in Redux
             localStorage.removeItem("cart");
             navigate("/orders");
           } else {
@@ -78,14 +100,14 @@ const PlaceOrder = () => {
         }
         case "stripe": {
           const res = await axios.post(
-            `${backendUrl}/api/order/place-order-stripe`,
+            `${baseUrl}/api/order/place-order-stripe`,
             orderData,
             { headers: { token } }
           );
 
           if (res.data.success) {
             const { session_url } = res.data;
-            setCartItems({});
+            dispatch({ type: "cart/clearCart" });
             localStorage.removeItem("cart");
             window.location.replace(session_url);
           } else {

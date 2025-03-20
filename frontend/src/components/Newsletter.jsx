@@ -2,9 +2,8 @@ import React, { useContext, useState } from "react";
 import toast, { LoaderIcon } from "react-hot-toast";
 import axios from "axios";
 import { ShopContext } from "../context/ShopContext";
-
+import { baseUrl } from "../constants";
 const Newsletter = () => {
-  const { backendUrl } = useContext(ShopContext);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -13,7 +12,7 @@ const Newsletter = () => {
 
     try {
       setIsLoading(true);
-      const res = await axios.post(`${backendUrl}/api/mail/subscribe`, {
+      const res = await axios.post(`${baseUrl}/api/mail/subscribe`, {
         email,
       });
 

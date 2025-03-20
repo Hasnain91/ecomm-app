@@ -1,13 +1,18 @@
 import React, { useContext, useEffect } from "react";
 import axios from "axios";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { baseUrl } from "../constants";
 
 const Verify = () => {
-  const { token, setCartItems, backendUrl } = useContext(ShopContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // const { token, setCartItems, backendUrl } = useContext(ShopContext);
+  const token = useSelector((state) => state.auth.token);
 
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
@@ -15,11 +20,13 @@ const Verify = () => {
   const verifyPayment = async () => {
     try {
       if (!token) {
+        navigate("/login");
+        toast.error("Please log in to verify your payment.");
         return null;
       }
 
       const res = await axios.post(
-        `${backendUrl}/api/order/verify-stripe`,
+        `${baseUrl}/api/order/verify-stripe`,
         {
           success,
           orderId,
@@ -28,14 +35,17 @@ const Verify = () => {
       );
 
       if (res.data.success) {
-        setCartItems({});
+        // setCartItems({});
+        dispatch({ type: "cart/clearCart" });
         navigate("/orders");
+        toast.success("Payment verified successfully!");
       } else {
         navigate("/cart");
+        toast.error("Payment verification failed. Please try again.");
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      console.log("Error verifying payment:", error);
+      toast.error(error.response?.data?.message || "An error occurred.");
     }
   };
 

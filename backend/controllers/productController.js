@@ -79,12 +79,17 @@ const listProducts = async (req, res) => {
 
     if (skip < 0) skip = 0;
 
-    const products = await Product.find(query).skip(skip).limit(Number(limit));
+    const productsAdmin = await Product.find(query)
+      .skip(skip)
+      .limit(Number(limit));
+
+    const allProducts = await Product.find({});
 
     const totalProducts = await Product.countDocuments(query);
     res.status(200).json({
       success: true,
-      products,
+      productsAdmin,
+      allProducts,
       totalProducts,
       currentPage: Number(page),
       totalPages: Math.ceil(totalProducts / limit),

@@ -13,7 +13,10 @@ import Login from "./pages/Login";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import Verify from "./pages/Verify";
+import { useSelector, useDispatch } from "react-redux";
+import { clearAuth } from "./redux/features/authSlice";
 import { backendUrl } from "../../admin/src/constants";
+import { fetchProducts } from "./redux/features/productSlice";
 
 import io from "socket.io-client";
 import { useContext, useEffect } from "react";
@@ -22,18 +25,35 @@ import { ShopContext } from "./context/ShopContext";
 const socket = io(backendUrl);
 
 const App = () => {
-  const { token, setToken, user } = useContext(ShopContext);
+  // const { token, setToken, user } = useContext(ShopContext);
 
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
+
+  // useEffect(() => {
+  //   if (user?._id) {
+  //     socket.emit("join", user._id); // ✅ Join user's own room
+
+  //     socket.on("forceLogout", (data) => {
+  //       alert(data.message);
+  //       setToken(null);
+  //       localStorage.removeItem("token");
+  //       window.location.href = "/login"; // ✅ Redirect to login page
+  //       toast.success("yesSs" + data?.message);
+  //     });
+  //   }
   useEffect(() => {
     if (user?._id) {
-      socket.emit("join", user._id); // ✅ Join user's own room
+      // Join the user's room
+      socket.emit("join", user._id);
 
+      // Listen for force logout events
       socket.on("forceLogout", (data) => {
         alert(data.message);
-        setToken(null);
-        localStorage.removeItem("token");
-        window.location.href = "/login"; // ✅ Redirect to login page
-        toast.success("yesSs" + data?.message);
+        dispatch(clearAuth()); // Clear auth state in Redux
+        window.location.href = "/login"; // Redirect to login page
+        toast.success(data?.message);
       });
     }
 
@@ -41,6 +61,10 @@ const App = () => {
       socket.off("forceLogout");
     };
   }, [user?._id]);
+
+  useEffect(() => {
+    dispatch(fetchProducts()); // Fetch products on app load
+  }, [dispatch]);
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Toaster

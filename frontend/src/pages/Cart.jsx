@@ -1,13 +1,24 @@
 import { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
+
 import { assets } from "../constants/index";
 import CartTotal from "../components/CartTotal";
 import DeleteModal from "../components/DeleteModal";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity, navigate } =
-    useContext(ShopContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Access global state using `useSelector`
+  const products = useSelector((state) => state.products.list);
+  const currency = useSelector((state) => state.config.currency);
+  const cartItems = useSelector((state) => state.cart.cartItems);
+
+  // const { products, currency, cartItems, updateQuantity, navigate } =
+  //   useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,13 +28,13 @@ const Cart = () => {
     if (products.length > 0) {
       const tempData = [];
 
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
+      for (const productId in cartItems) {
+        for (const size in cartItems[productId]) {
+          if (cartItems[productId][size] > 0) {
             tempData.push({
-              _id: items,
-              size: item,
-              quantity: cartItems[items][item],
+              _id: productId,
+              size: size,
+              quantity: cartItems[productId][size],
             });
           }
         }
@@ -42,7 +53,10 @@ const Cart = () => {
   // Function to delete the item
   const confirmDelete = () => {
     if (selectedItem) {
-      updateQuantity(selectedItem._id, selectedItem.size, 0);
+      dispatch({
+        type: "cart/removeFromCart",
+        payload: { productId: selectedItem._id, size: selectedItem.size },
+      });
       toast.success("Product removed from the cart.");
     }
     setIsModalOpen(false);
@@ -97,11 +111,14 @@ const Cart = () => {
                 onChange={(e) =>
                   e.target.value === "" || e.target.value === "0"
                     ? null
-                    : updateQuantity(
-                        item._id,
-                        item.size,
-                        Number(e.target.value)
-                      )
+                    : dispatch({
+                        type: "cart/updateQuantity",
+                        payload: {
+                          productId: item._id,
+                          size: item.size,
+                          quantity: Number(e.target.value),
+                        },
+                      })
                 }
                 type="number"
                 min={1}

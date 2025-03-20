@@ -1,27 +1,51 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../constants/index";
-import { Link, NavLink } from "react-router-dom";
-import { ShopContext } from "../context/ShopContext";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+// import { ShopContext } from "../context/ShopContext";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
-  const {
-    setShowSearch,
-    getCartCount,
-    navigate,
-    token,
-    setToken,
-    setCartItems,
-  } = useContext(ShopContext);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // const {
+  //   setShowSearch,
+  //   getCartCount,
+  //   navigate,
+  //   token,
+  //   setToken,
+  //   setCartItems,
+  // } = useContext(ShopContext);
 
+  // Access global state using `useSelector`
+  const cartItems = useSelector((state) => state.cart.cartItems);
+  const token = useSelector((state) => state.auth.token);
+  const getCartCount = () => {
+    let totalCount = 0;
+    for (const productId in cartItems) {
+      for (const size in cartItems[productId]) {
+        totalCount += cartItems[productId][size];
+      }
+    }
+    return totalCount;
+  };
+  // Logout function
   const logout = () => {
+    dispatch({ type: "auth/clearAuth" }); // Clear auth state in Redux
     localStorage.removeItem("token");
-    setToken("");
-    setCartItems({});
+    localStorage.removeItem("cart");
     navigate("/login");
     toast.success("Logged out.");
   };
+
+  // const logout = () => {
+  //   localStorage.removeItem("token");
+  //   setToken("");
+  //   setCartItems({});
+  //   navigate("/login");
+  //   toast.success("Logged out.");
+  // };
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">
@@ -50,7 +74,9 @@ const Navbar = () => {
 
       <div className="flex items-center gap-6">
         <img
-          onClick={() => setShowSearch(true)}
+          onClick={() =>
+            dispatch({ type: "search/setShowSearch", payload: true })
+          }
           src={assets.search_icon}
           alt="Search Icon"
           className="w-5 cursor-pointer "
