@@ -1,47 +1,29 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import CartTotal from "../components/CartTotal";
 import { assets, baseUrl } from "../constants/index";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { getCartAmount } from "../redux/features/cartSlice";
 
-// import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { placeOrderCOD, placeOrderStripe } from "../api/endpoints";
 
 const PlaceOrder = () => {
   const [paymentMethod, setPaymentMethod] = useState("cod");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const {
-  //   token,
-  //   cartItems,
-  //   setCartItems,
-  //   getCartAmount,
-  //   delivery_fee,
-  //   products,
-  // } = useContext(ShopContext);
-  // Access global state using `useSelector`
+
   const token = useSelector((state) => state.auth.token);
   const cartItems = useSelector((state) => state.cart.cartItems);
   const products = useSelector((state) => state.products.list);
   const delivery_fee = useSelector((state) => state.config.deliveryFee);
-  // // Calculate cart amount using Redux state
-  const getCartAmount = (cartItems, products) => {
-    let totalAmount = 0;
+  const cartTotal = useSelector((state) =>
+    getCartAmount(state, state.products.list)
+  );
 
-    for (const productId in cartItems) {
-      const product = products[productId]; // Access product directly by ID
-      if (!product) continue;
-
-      for (const size in cartItems[productId]) {
-        totalAmount += product.price * cartItems[productId][size];
-      }
-    }
-
-    return totalAmount;
-  };
   const {
     register,
     handleSubmit,
@@ -76,20 +58,16 @@ const PlaceOrder = () => {
       let orderData = {
         address: formData,
         items: orderItems,
-        amount: getCartAmount(cartItems, products) + delivery_fee,
+        amount: cartTotal + delivery_fee,
       };
 
       switch (paymentMethod) {
         case "cod": {
-          const res = await axios.post(
-            `${baseUrl}/api/order/place-order-cod`,
-            orderData,
-            { headers: { token } }
-          );
+          const res = await placeOrderCOD(orderData, token);
 
           if (res.data.success) {
             toast.success(res.data.message);
-            dispatch({ type: "cart/clearCart" }); // Clear cart in Redux
+            dispatch({ type: "cart/clearCart" });
             localStorage.removeItem("cart");
             navigate("/orders");
           } else {
@@ -99,11 +77,7 @@ const PlaceOrder = () => {
           break;
         }
         case "stripe": {
-          const res = await axios.post(
-            `${baseUrl}/api/order/place-order-stripe`,
-            orderData,
-            { headers: { token } }
-          );
+          const res = await placeOrderStripe(orderData, token);
 
           if (res.data.success) {
             const { session_url } = res.data;

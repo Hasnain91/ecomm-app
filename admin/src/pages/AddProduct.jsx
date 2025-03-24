@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { assets } from "../assets/assets";
 import { toast } from "react-hot-toast";
-import axios from "axios";
-import { backendUrl } from "../constants";
 import { LoaderCircle } from "lucide-react";
+import { addProduct } from "../api/endpoints";
 
 const AddProduct = ({ token }) => {
   const [image1, setImage1] = useState(false);
@@ -39,9 +38,7 @@ const AddProduct = ({ token }) => {
       image3 && formData.append("image3", image3);
       image4 && formData.append("image4", image4);
 
-      const res = await axios.post(`${backendUrl}/api/product/add`, formData, {
-        headers: { token },
-      });
+      const res = await addProduct(formData, token);
       if (res.data.success) {
         toast.success(res.data.message);
         setName("");

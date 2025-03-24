@@ -7,11 +7,6 @@ export const fetchProducts = createAsyncThunk(
   async () => {
     const res = await axios.get(`${baseUrl}/api/product/list`);
     if (res.data.success) {
-      // console.log(res.data);
-      // console.log(
-      //   "Is allProducts an array?",
-      //   Array.isArray(res.data.allProducts)
-      // );
       return res.data.allProducts;
     }
   }
@@ -34,12 +29,8 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // console.log("List is being updated: " + action.payload);
 
         state.list = Array.isArray(action.payload) ? action.payload : [];
-        // console.log("Is state.list an array?", Array.isArray(state.list));
-        // console.log("Updated list: " + state.list);
-        // console.log(typeof state.list);
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = "failed";

@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-// import { ShopContext } from "../context/ShopContext";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import ProductItem from "./ProductItem";
 
 const LatestCollection = () => {
-  // const { products } = useContext(ShopContext);
   const products = useSelector((state) => state.products.list);
 
   const [latestProducts, setLatestProducts] = useState([]);
@@ -17,7 +15,6 @@ const LatestCollection = () => {
   return (
     <div className="my-10">
       <div className="text-center py-8 text-3xl">
-        {/* <Title heading={"LATEST"} description={"COLLECTION"} /> */}
         <div className="inline-flex gap-2 items-center mb-3">
           <p className="text-gray-500">
             LATEST <span className="text-gray-700 font-medium">COLLECTION</span>

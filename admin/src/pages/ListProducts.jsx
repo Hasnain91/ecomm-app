@@ -6,6 +6,7 @@ import { backendUrl } from "../constants";
 import DeleteModal from "../components/DeleteModal";
 import { Trash } from "lucide-react";
 import Pagination from "../components/Pagination";
+import { getAllProducts, removeProduct } from "../api/endpoints";
 
 const ListProducts = ({ token }) => {
   const navigate = useNavigate();
@@ -22,12 +23,10 @@ const ListProducts = ({ token }) => {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${backendUrl}/api/product/list`, {
-        params: { q: searchTerm, page: currentPage, limit: 10 },
-      });
+      const res = await getAllProducts(searchTerm, currentPage, token);
 
       if (res.data.success) {
-        setProductList(res.data.products);
+        setProductList(res.data.allProducts);
         setTotalPages(res.data.totalPages);
       } else {
         toast.error(res.data.message);
@@ -57,11 +56,8 @@ const ListProducts = ({ token }) => {
   const removeProduct = async () => {
     if (!selectedProduct) return;
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/product/remove`,
-        { id: selectedProduct._id },
-        { headers: { token } }
-      );
+      const res = await removeProduct(selectedProduct._id, token);
+
       if (res.data.success) {
         toast.success(res.data.message);
         await fetchProducts();

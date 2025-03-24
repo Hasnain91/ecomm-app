@@ -1,5 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import io from "socket.io-client";
+import { useEffect } from "react";
+
 import Home from "./pages/Home";
 import Collection from "./pages/Collection";
 import About from "./pages/About";
@@ -18,41 +21,27 @@ import { clearAuth } from "./redux/features/authSlice";
 import { backendUrl } from "../../admin/src/constants";
 import { fetchProducts } from "./redux/features/productSlice";
 
-import io from "socket.io-client";
-import { useContext, useEffect } from "react";
-import { ShopContext } from "./context/ShopContext";
-
 const socket = io(backendUrl);
 
 const App = () => {
-  // const { token, setToken, user } = useContext(ShopContext);
-
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
 
-  // useEffect(() => {
-  //   if (user?._id) {
-  //     socket.emit("join", user._id); // ✅ Join user's own room
-
-  //     socket.on("forceLogout", (data) => {
-  //       alert(data.message);
-  //       setToken(null);
-  //       localStorage.removeItem("token");
-  //       window.location.href = "/login"; // ✅ Redirect to login page
-  //       toast.success("yesSs" + data?.message);
-  //     });
-  //   }
   useEffect(() => {
-    if (user?._id) {
+    if (!user) {
+      console.log("⏳ Waiting for user data...");
+      return;
+    }
+    if (user) {
       // Join the user's room
-      socket.emit("join", user._id);
+      socket.emit("join", user);
 
       // Listen for force logout events
       socket.on("forceLogout", (data) => {
-        alert(data.message);
-        dispatch(clearAuth()); // Clear auth state in Redux
-        window.location.href = "/login"; // Redirect to login page
+        toast.error("You have been logged out, please contact admin");
+
+        dispatch(clearAuth());
+        window.location.href = "/login";
         toast.success(data?.message);
       });
     }
@@ -60,11 +49,12 @@ const App = () => {
     return () => {
       socket.off("forceLogout");
     };
-  }, [user?._id]);
+  }, [user]);
 
   useEffect(() => {
-    dispatch(fetchProducts()); // Fetch products on app load
+    dispatch(fetchProducts());
   }, [dispatch]);
+
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <Toaster

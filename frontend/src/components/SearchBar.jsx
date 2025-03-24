@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-// import { ShopContext } from "../context/ShopContext";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { assets } from "../constants/index";
 import { useLocation } from "react-router-dom";
@@ -7,9 +6,6 @@ import { useLocation } from "react-router-dom";
 const SearchBar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-
-  // const { search, setSearch, showSearch, setShowSearch } =
-  //   useContext(ShopContext);
 
   const search = useSelector((state) => state.search.search);
   const showSearch = useSelector((state) => state.search.showSearch);

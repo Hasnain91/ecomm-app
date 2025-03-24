@@ -52,18 +52,3 @@ const CartTotal = () => {
 };
 
 export default CartTotal;
-
-// Function to calculate the total cart amount
-// const getCartAmount = () => {
-//   let totalAmount = 0;
-//   for (const productId in cartItems) {
-//     const product = Object.values(cartItems[productId]);
-//     product.forEach(({ quantity, price }) => {
-//       totalAmount += price * quantity;
-//     });
-//   }
-//   return totalAmount;
-// };
-
-// const { currency, delivery_fee, getCartAmount } = useContext(ShopContext);
-// Access global state using `useSelector`

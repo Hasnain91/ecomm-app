@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import toast, { LoaderIcon } from "react-hot-toast";
 import axios from "axios";
-import { ShopContext } from "../context/ShopContext";
 import { baseUrl } from "../constants";
+import { subscribeToNewsletter } from "../api/endpoints";
+
 const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -12,9 +13,7 @@ const Newsletter = () => {
 
     try {
       setIsLoading(true);
-      const res = await axios.post(`${baseUrl}/api/mail/subscribe`, {
-        email,
-      });
+      const res = await subscribeToNewsletter(email);
 
       if (res.data.success) {
         toast("Subscription successful! Check your email.", {

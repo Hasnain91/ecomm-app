@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-// import { ShopContext } from "../context/ShopContext";
 import { useSelector, useDispatch } from "react-redux";
 import { assets } from "../constants/index";
 import RelatedProducts from "../components/RelatedProducts";
@@ -13,8 +12,6 @@ const Product = () => {
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
 
-  // const { products, currency, addToCart } = useContext(ShopContext);
-  // Access global state using `useSelector`
   const products = useSelector((state) => state.products.list);
   const currency = useSelector((state) => state.config.currency);
 
@@ -103,7 +100,6 @@ const Product = () => {
             </div>
           </div>
           <button
-            // onClick={() => addToCart(productData?._id, size)}
             onClick={handleAddToCart}
             className="bg-black text-white px-8 py-3 cursor-pointer transition-colors duration-200 ease-in hover:text-black hover:bg-gray-100"
           >

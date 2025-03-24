@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../constants/index";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-// import { ShopContext } from "../context/ShopContext";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
@@ -9,16 +8,7 @@ const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const {
-  //   setShowSearch,
-  //   getCartCount,
-  //   navigate,
-  //   token,
-  //   setToken,
-  //   setCartItems,
-  // } = useContext(ShopContext);
 
-  // Access global state using `useSelector`
   const cartItems = useSelector((state) => state.cart.cartItems);
   const token = useSelector((state) => state.auth.token);
   const getCartCount = () => {
@@ -38,14 +28,6 @@ const Navbar = () => {
     navigate("/login");
     toast.success("Logged out.");
   };
-
-  // const logout = () => {
-  //   localStorage.removeItem("token");
-  //   setToken("");
-  //   setCartItems({});
-  //   navigate("/login");
-  //   toast.success("Logged out.");
-  // };
 
   return (
     <div className="flex items-center justify-between py-5 font-medium">

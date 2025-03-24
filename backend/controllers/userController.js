@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { getIo } = require("../config/socket"); // Import the socket instance
+const { updateOrderStatus } = require("../../admin/src/api/endpoints");
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET);
@@ -146,8 +147,13 @@ const updateUserStatus = async (req, res) => {
     user.status = status;
     await user.save();
 
-    // Notify user via WebSocket
     const io = getIo();
+    if (!io) {
+      console.error("Socket.io instance is undefined!");
+      return res.status(500).json({ success: false, message: "Server Error" });
+    }
+
+    console.log("Emitting forceLogout to:", userId);
     io.to(userId).emit("forceLogout", {
       message: "Your account status has changed. Please log in again.",
     });

@@ -15,6 +15,7 @@ const initializeSocket = (server) => {
 
     socket.on("join", (userId) => {
       socket.join(userId); // Make user join their own room
+      // console.log(`User ${userId} joined room: ${userId}`);
     });
 
     socket.on("disconnect", () => {

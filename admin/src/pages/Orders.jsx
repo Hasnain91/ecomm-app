@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { backendUrl, currency } from "../constants";
 import { assets } from "../assets/assets";
+import { getAllOrders, updateOrderStatus } from "../api/endpoints";
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
@@ -13,11 +14,7 @@ const Orders = ({ token }) => {
     if (!token) return null;
 
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/order/list`,
-        {},
-        { headers: { token } }
-      );
+      const res = await getAllOrders(token);
 
       if (res.data.success) {
         setOrders(res.data.orders);
@@ -33,12 +30,8 @@ const Orders = ({ token }) => {
 
   const handleOrderStatus = async (e, orderId) => {
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/order/status`,
-        { orderId, status: e.target.value },
-        { headers: { token } }
-      );
-
+      const newStatus = e.target.value;
+      const res = await updateOrderStatus(orderId, newStatus, token);
       if (res.data.success) {
         await fetchAllOrders();
       }

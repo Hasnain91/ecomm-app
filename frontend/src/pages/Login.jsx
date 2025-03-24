@@ -1,15 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { ShopContext } from "../context/ShopContext";
-import { baseUrl } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../api/endpoints";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
-  // const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,47 +25,48 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    try {
-      if (!data.email || !data.password) return;
+    if (!data.email || !data.password) return;
 
-      if (currentState === "Sign Up" && !data.name) {
-        toast.error("Name is required");
-        return;
-      }
-
-      let res;
-      if (currentState === "Sign Up") {
-        res = await axios.post(`${baseUrl}/api/user/register`, {
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        });
-      } else {
-        res = await axios.post(`${baseUrl}/api/user/login`, {
-          email: data.email,
-          password: data.password,
-        });
-      }
-
-      if (res.data.success) {
-        // setToken(res.data.token);
-        dispatch({ type: "auth/setToken", payload: res.data.token });
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.userId);
-        toast.success(
-          currentState === "Sign Up"
-            ? "Registration Successful"
-            : "Login Successful"
-        );
-        reset();
-        navigate("/");
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      console.error("Error in Signing Up/Login:", error);
-      toast.error(error?.response?.data?.message || "Something went wrong");
+    if (currentState === "Sign Up" && !data.name) {
+      toast.error("Name is required");
+      return;
     }
+
+    const request =
+      currentState === "Sign Up"
+        ? registerUser({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          })
+        : loginUser({ email: data.email, password: data.password });
+
+    toast
+      .promise(request, {
+        loading:
+          currentState === "Sign Up" ? "Registering..." : "Logging in...",
+        success: (
+          <em>
+            {currentState === "Sign Up"
+              ? "Registration Successful!"
+              : "Login Successful!"}
+          </em>
+        ),
+        error: (err) => (
+          <b>{err?.response?.data?.message || "Something went wrong"}</b>
+        ),
+      })
+      .then((res) => {
+        if (res.data.success) {
+          dispatch({ type: "auth/setToken", payload: res.data.token });
+          dispatch({ type: "auth/setUser", payload: res.data.userId });
+          reset();
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        console.error("Error in Signing Up/Login:", error);
+      });
   };
 
   useEffect(() => {

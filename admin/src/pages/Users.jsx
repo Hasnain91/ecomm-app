@@ -3,6 +3,8 @@ import axios from "axios";
 import { User2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { backendUrl } from "../constants";
+import { getAllUsers, updateUserStatus } from "../api/endpoints";
+updateUserStatus;
 
 const Users = ({ token }) => {
   const [users, setUsers] = useState([]);
@@ -17,14 +19,9 @@ const Users = ({ token }) => {
 
     try {
       setIsLoading(true);
-      const res = await axios.get(
-        `${backendUrl}/api/user/all-users`,
-        {},
-        { headers: { token } }
-      );
+      const res = await getAllUsers(token);
 
       if (res.data.success) {
-        console.log(res.data.users);
         setUsers(res.data.users);
       } else {
         toast.error(res.data.message);
@@ -44,14 +41,8 @@ const Users = ({ token }) => {
   const handleUserStatusChange = async (e, userId) => {
     try {
       const status = e.target.value;
-      const res = await axios.post(
-        `${backendUrl}/api/user/update-status`,
-        {
-          userId,
-          status,
-        },
-        { headers: { token } }
-      );
+
+      const res = await updateUserStatus(userId, status, token);
 
       if (res.data.success) {
         toast.success(res.data.message);

@@ -60,22 +60,6 @@ export const getCartCount = (state) => {
   return totalCount;
 };
 
-// export const getCartAmount = (state, products) => {
-//   let totalAmount = 0;
-
-//   for (const productId in state.cart.cartItems) {
-//     const product = products[productId];
-//     if (!product) continue;
-
-//     // for (const size in state.cart.cartItems[productId]) {
-//     //   totalAmount += product.price * state.cart.cartItems[productId][size];
-//     // }
-//     for (const size in state.cart.cartItems[productId]) {
-//       const quantity = state.cart.cartItems[productId][size];
-//       totalAmount += product.price * quantity; // Add to the total amount
-//     }
-//   }
-
 //   return totalAmount;
 export const getCartAmount = (state, products) => {
   let totalAmount = 0;

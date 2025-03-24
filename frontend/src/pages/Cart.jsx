@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from "react";
-// import { ShopContext } from "../context/ShopContext";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { assets } from "../constants/index";
@@ -12,13 +11,9 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Access global state using `useSelector`
   const products = useSelector((state) => state.products.list);
   const currency = useSelector((state) => state.config.currency);
   const cartItems = useSelector((state) => state.cart.cartItems);
-
-  // const { products, currency, cartItems, updateQuantity, navigate } =
-  //   useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

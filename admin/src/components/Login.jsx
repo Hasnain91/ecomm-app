@@ -1,8 +1,7 @@
 import React from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
-import { backendUrl } from "../constants";
+import { adminLogin } from "../api/endpoints";
 
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
@@ -11,10 +10,8 @@ const Login = ({ setToken }) => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const res = await axios.post(`${backendUrl}/api/user/admin`, {
-        email,
-        password,
-      });
+      const credentials = { email, password };
+      const res = await adminLogin(credentials);
 
       if (res.data.success) {
         setToken(res.data.token);

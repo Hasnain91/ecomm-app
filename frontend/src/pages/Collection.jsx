@@ -1,10 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
-import { CircleChevronRight, CircleChevronLeft } from "lucide-react";
-// import { ShopContext } from "../context/ShopContext";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
 import { assets } from "../constants/index";
-
 import ProductItem from "../components/ProductItem";
 
 const Collection = () => {
@@ -13,11 +9,7 @@ const Collection = () => {
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [typeFilter, setTypeFilter] = useState([]);
   const [sortType, setSortType] = useState("relevant");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(20);
 
-  // const { products, search, showSearch } = useContext(ShopContext);
-  // Access global state using `useSelector`
   const products = useSelector((state) => state.products.list);
   const search = useSelector((state) => state.search.search);
   const showSearch = useSelector((state) => state.search.showSearch);
@@ -61,7 +53,6 @@ const Collection = () => {
     }
 
     setFilterProducts(productsCopy);
-    setCurrentPage(1);
   };
 
   const sortPoducts = () => {
