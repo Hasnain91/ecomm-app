@@ -22,22 +22,22 @@ export const getAllProducts = async (searchTerm, currentPage, token) => {
   return response;
 };
 
-export const removeProduct = async (productId, token) => {
+export const deleteProduct = async (productId, token) => {
   const response = await axios.post(
     `${backendUrl}/api/product/remove`,
     { id: productId },
     { headers: { token } }
   );
-  return response.data;
+  return response;
 };
 
 /////////////////////////////////////////////////////////
 // ***************** Order APIs***********************
 /////////////////////////////////////////////////////////
-export const getAllOrders = async (token) => {
+export const getAllOrders = async (searchTerm, currentPage, token) => {
   const response = await axios.post(
     `${backendUrl}/api/order/list`,
-    {},
+    { params: { q: searchTerm, page: currentPage, limit: 10 } },
     { headers: { token } }
   );
   return response;

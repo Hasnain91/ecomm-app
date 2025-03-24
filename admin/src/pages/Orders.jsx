@@ -1,32 +1,52 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-hot-toast";
-import { backendUrl, currency } from "../constants";
+import { currency } from "../constants";
 import { assets } from "../assets/assets";
 import { getAllOrders, updateOrderStatus } from "../api/endpoints";
+import Pagination from "../components/Pagination";
+import { highlightSearchTerm } from "../utils/Helper";
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  // For pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchAllOrders = async () => {
     if (!token) return null;
 
     try {
-      const res = await getAllOrders(token);
+      setIsLoading(true);
+      const res = await getAllOrders(searchTerm, currentPage, token);
 
       if (res.data.success) {
-        setOrders(res.data.orders);
-        console.log(res.data.orders);
+        setOrders(res.data.allOrders);
+        // console.log("All orders are: ", res.data.allOrders);
+        setTotalPages(res.data.totalPages);
+        // console.log("Total Pages: ", res.data.totalPages);
       } else {
         toast.error(res.data.message);
       }
     } catch (error) {
       console.log("Error in fetchAllOrders :", error);
       toast.error(error.response?.data?.message);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+    fetchAllOrders();
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchAllOrders();
+  }, [currentPage, token]);
 
   const handleOrderStatus = async (e, orderId) => {
     try {
@@ -41,18 +61,22 @@ const Orders = ({ token }) => {
     }
   };
 
-  useEffect(() => {
-    fetchAllOrders();
-  }, [token]);
-
   return (
-    <div>
-      <h3>Orders Page</h3>
+    <>
       <div>
-        {orders
-          .slice()
-          .reverse()
-          .map((order, index) => (
+        <div className="flex justify-between items-center">
+          <h3>Orders Page</h3>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} // Update search term
+            className="px-4 py-2 border bg-gray-50 border-gray-300 rounded-md w-96 focus:outline-none focus:shadow-2xl focus:shadow-gray-500 focus:border-gray-500 transition"
+          />
+        </div>
+
+        <div>
+          {orders.map((order, index) => (
             <div
               className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-500 p-5 md:p-8 my-3 md:my-4 text-sm sm:text-base text-gray-700"
               key={index}
@@ -64,28 +88,22 @@ const Orders = ({ token }) => {
               />
               <div>
                 <div>
-                  {order.items.map((item, index) => {
-                    if (index === order.items.length - 1) {
-                      return (
-                        <p className="py-1" key={index}>
-                          {item.name} x {item.quantity} <span>{item.size}</span>
-                        </p>
-                      );
-                    } else {
-                      return (
-                        <p className="py-1" key={index}>
-                          {item.name} x {item.quantity} <span>{item.size}</span>
-                          ,
-                        </p>
-                      );
-                    }
-                  })}
+                  {order.items.map((item, index) => (
+                    <p className="py-1" key={index}>
+                      {item.name} x {item.quantity} <span>{item.size}</span>
+                    </p>
+                  ))}
                 </div>
-                <p className="mt-3 mb-2 font-semibold tracking-wider text-base text-gray-900">{`${order.address.firstName} ${order.address.lastName}`}</p>
+                <p className="mt-3 mb-2 font-semibold tracking-wider text-base text-gray-900">
+                  {highlightSearchTerm(
+                    `${order.address.firstName} ${order.address.lastName}`,
+                    searchTerm
+                  )}
+                </p>
                 <div>
                   <p>{`${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.country}, ${order.address.zipcode}`}</p>
                 </div>
-                <p>{order.address.phone}</p>
+                <p>{highlightSearchTerm(order.address.phone, searchTerm)}</p>
               </div>
               <div>
                 <p className="text-base sm:text-[18px]">
@@ -112,8 +130,14 @@ const Orders = ({ token }) => {
               </select>
             </div>
           ))}
+        </div>
       </div>
-    </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </>
   );
 };
 

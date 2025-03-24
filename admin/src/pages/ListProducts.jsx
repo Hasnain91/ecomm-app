@@ -1,12 +1,11 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { backendUrl } from "../constants";
 import DeleteModal from "../components/DeleteModal";
-import { Trash } from "lucide-react";
+import { Trash, Pencil } from "lucide-react";
 import Pagination from "../components/Pagination";
-import { getAllProducts, removeProduct } from "../api/endpoints";
+import { getAllProducts, deleteProduct } from "../api/endpoints";
+import { highlightSearchTerm } from "../utils/Helper";
 
 const ListProducts = ({ token }) => {
   const navigate = useNavigate();
@@ -56,7 +55,7 @@ const ListProducts = ({ token }) => {
   const removeProduct = async () => {
     if (!selectedProduct) return;
     try {
-      const res = await removeProduct(selectedProduct._id, token);
+      const res = await deleteProduct(selectedProduct._id, token);
 
       if (res.data.success) {
         toast.success(res.data.message);
@@ -70,21 +69,6 @@ const ListProducts = ({ token }) => {
     }
     setIsModalOpen(false);
     setSelectedProduct(null);
-  };
-
-  // Function to highlight the search term in text
-  const highlightSearchTerm = (text, term) => {
-    if (!term) return text; // If no search term, return the original text
-    const regex = new RegExp(`(${term})`, "gi"); // Case-insensitive match
-    return text.split(regex).map((part, index) =>
-      regex.test(part) ? (
-        <span key={index} className="bg-pink-300 font-medium text-pink-950">
-          {part}
-        </span>
-      ) : (
-        part
-      )
-    );
   };
 
   return (
@@ -130,12 +114,17 @@ const ListProducts = ({ token }) => {
               <p>{highlightSearchTerm(prod.name, searchTerm)}</p>
               <p>{highlightSearchTerm(prod.category, searchTerm)}</p>
               <p>{prod.price}</p>
-              <p
-                onClick={() => handleDeleteClick(prod)}
-                className="mx-auto text-red-400 cursor-pointer text-xl font-bold"
-              >
-                <Trash />
-              </p>
+              <div className="flex justify-center gap-5 w-full place-self-center">
+                <p className=" text-green-400 cursor-pointer text-xl font-bold">
+                  <Pencil />
+                </p>
+                <p
+                  onClick={() => handleDeleteClick(prod)}
+                  className=" text-red-400 cursor-pointer text-xl font-bold"
+                >
+                  <Trash />
+                </p>
+              </div>
             </div>
           ))
         ) : (

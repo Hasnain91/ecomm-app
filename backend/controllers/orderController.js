@@ -209,9 +209,29 @@ const verifyStripe = async (req, res) => {
 
 // get all orders to display on admin panel
 const getAllOrders = async (req, res) => {
+  const { q, page = 1, limit = 10 } = req.query;
   try {
-    const orders = await Order.find({});
-    res.status(200).json({ success: true, orders });
+    let skip = (page - 1) * limit;
+    if (skip < 0) skip = 0;
+    const query = {};
+    if (q) {
+      query.$or = [
+        { "address.firstName": { $regex: q, $options: "i" } }, // Case-insensitive match for firstName
+        { "address.lastName": { $regex: q, $options: "i" } }, // Case-insensitive match for lastName
+        { "address.phone": { $regex: q, $options: "i" } }, // Case-insensitive match for phone
+      ];
+    }
+    const ordersAdmin = await Order.find(query).skip(skip).limit(Number(limit));
+    const allOrders = await Order.find({});
+    const totalOrderds = await Order.countDocuments(query);
+    res.status(200).json({
+      success: true,
+      ordersAdmin,
+      allOrders,
+      totalOrderds,
+      currentPage: Number(page),
+      totalPages: Math.ceil(totalOrderds / limit),
+    });
   } catch (error) {
     console.log("Error in getAllOrders controller: ", error);
     res.status(500).json({ success: false, message: error?.message });
