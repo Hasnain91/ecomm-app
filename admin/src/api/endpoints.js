@@ -9,6 +9,7 @@ export const addProduct = async (formData, token) => {
   const response = await axios.post(`${backendUrl}/api/product/add`, formData, {
     headers: { token },
   });
+  console.log(response);
 
   return response;
 };
@@ -22,6 +23,16 @@ export const getAllProducts = async (searchTerm, currentPage, token) => {
   return response;
 };
 
+export const updateProduct = async (id, formData, token) => {
+  const response = await axios.put(
+    `${backendUrl}/api/product/edit/${id}`,
+    formData,
+    {
+      headers: { token },
+    }
+  );
+  return response;
+};
 export const deleteProduct = async (productId, token) => {
   const response = await axios.post(
     `${backendUrl}/api/product/remove`,
