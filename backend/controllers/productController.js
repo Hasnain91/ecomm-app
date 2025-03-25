@@ -83,10 +83,13 @@ const listProducts = async (req, res) => {
       .skip(skip)
       .limit(Number(limit));
 
+    const allProducts = await Product.find({});
+
     const totalProducts = await Product.countDocuments(query);
     res.status(200).json({
       success: true,
       productsAdmin,
+      allProducts,
       totalProducts,
       currentPage: Number(page),
       totalPages: Math.ceil(totalProducts / limit),
@@ -168,13 +171,11 @@ const editProduct = async (req, res) => {
     // Save the updated product
     await product.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Product Updated Successfully!!",
-        updatedProduct: product,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Product Updated Successfully!!",
+      product,
+    });
   } catch (error) {
     console.log("Error in editProduct controller: ", error);
     res.status(500).json({ success: false, message: error?.message });

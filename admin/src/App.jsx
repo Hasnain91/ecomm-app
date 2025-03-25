@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 import NavBar from "./components/NavBar";
 import Sidebar from "./components/Sidebar";
@@ -10,6 +10,7 @@ import ListProducts from "./pages/ListProducts";
 import Orders from "./pages/orders";
 import { useEffect } from "react";
 import Users from "./pages/Users";
+import EditProduct from "./pages/EditProduct";
 
 const App = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -55,6 +56,10 @@ const App = () => {
                 />
                 <Route path="/orders" element={<Orders token={token} />} />
                 <Route path="/users" element={<Users token={token} />} />
+                <Route
+                  path="/edit-product/:id"
+                  element={<EditProduct token={token} />}
+                />
               </Routes>
             </div>
           </div>
