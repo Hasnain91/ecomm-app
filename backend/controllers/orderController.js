@@ -216,18 +216,17 @@ const getAllOrders = async (req, res) => {
     const query = {};
     if (q) {
       query.$or = [
-        { "address.firstName": { $regex: q, $options: "i" } }, // Case-insensitive match for firstName
-        { "address.lastName": { $regex: q, $options: "i" } }, // Case-insensitive match for lastName
-        { "address.phone": { $regex: q, $options: "i" } }, // Case-insensitive match for phone
+        { "address.firstName": { $regex: q, $options: "i" } },
+        { "address.lastName": { $regex: q, $options: "i" } },
+        { "address.phone": { $regex: q, $options: "i" } },
       ];
     }
     const ordersAdmin = await Order.find(query).skip(skip).limit(Number(limit));
-    const allOrders = await Order.find({});
+
     const totalOrderds = await Order.countDocuments(query);
     res.status(200).json({
       success: true,
       ordersAdmin,
-      allOrders,
       totalOrderds,
       currentPage: Number(page),
       totalPages: Math.ceil(totalOrderds / limit),

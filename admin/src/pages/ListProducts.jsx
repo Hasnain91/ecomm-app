@@ -25,7 +25,7 @@ const ListProducts = ({ token }) => {
       const res = await getAllProducts(searchTerm, currentPage, token);
 
       if (res.data.success) {
-        setProductList(res.data.allProducts);
+        setProductList(res.data.productsAdmin);
         setTotalPages(res.data.totalPages);
       } else {
         toast.error(res.data.message);
@@ -115,7 +115,10 @@ const ListProducts = ({ token }) => {
               <p>{highlightSearchTerm(prod.category, searchTerm)}</p>
               <p>{prod.price}</p>
               <div className="flex justify-center gap-5 w-full place-self-center">
-                <p className=" text-green-400 cursor-pointer text-xl font-bold">
+                <p
+                  onClick={() => navigate(`/edit-product/${prod._id}`)}
+                  className=" text-green-400 cursor-pointer text-xl font-bold"
+                >
                   <Pencil />
                 </p>
                 <p

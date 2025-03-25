@@ -7,6 +7,7 @@ const {
   listProducts,
   removeProduct,
   getProduct,
+  editProduct,
 } = require("../controllers/productController");
 
 const router = express.Router();
@@ -25,5 +26,17 @@ router.post(
 router.post("/remove", adminAuth, removeProduct);
 router.get("/list", listProducts);
 router.get("/single/:id", getProduct);
+// Edit Product Route
+router.put(
+  "/edit/:id",
+  adminAuth,
+  upload.fields([
+    { name: "image1", maxCount: 1 },
+    { name: "image2", maxCount: 1 },
+    { name: "image3", maxCount: 1 },
+    { name: "image4", maxCount: 1 },
+  ]),
+  editProduct
+);
 
 module.exports = router;

@@ -61,7 +61,8 @@ const App = () => {
         position="top-right"
         toastOptions={{
           style: {
-            fontSize: "20px",
+            fontSize: "18px",
+            fontWeight: "normal",
             borderRadius: "100px",
             background: "#333",
             color: "#fff",

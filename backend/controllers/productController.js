@@ -83,13 +83,10 @@ const listProducts = async (req, res) => {
       .skip(skip)
       .limit(Number(limit));
 
-    const allProducts = await Product.find({});
-
     const totalProducts = await Product.countDocuments(query);
     res.status(200).json({
       success: true,
       productsAdmin,
-      allProducts,
       totalProducts,
       currentPage: Number(page),
       totalPages: Math.ceil(totalProducts / limit),
@@ -114,6 +111,76 @@ const removeProduct = async (req, res) => {
   }
 };
 
+const editProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      description,
+      price,
+      category,
+      subCategory,
+      sizes,
+      bestSeller,
+    } = req.body;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product Not Found" });
+    }
+
+    // Update product fields
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.price = price ? Number(price) : product.price;
+    product.category = category || product.category;
+    product.subCategory = subCategory || product.subCategory;
+    product.bestSeller = bestSeller === "true" ? true : product.bestSeller;
+    product.sizes = sizes ? JSON.parse(sizes) : product.sizes;
+
+    // Handle images
+    const image1 = req.files?.image1 && req.files.image1[0];
+    const image2 = req.files?.image2 && req.files.image2[0];
+    const image3 = req.files?.image3 && req.files.image3[0];
+    const image4 = req.files?.image4 && req.files.image4[0];
+
+    const newImages = [image1, image2, image3, image4].filter(
+      (img) => img !== undefined
+    );
+    if (newImages.length > 0) {
+      // Upload new images to Cloudinary
+      const newImagesUrl = await Promise.all(
+        newImages.map(async (image) => {
+          const res = await cloudinary.uploader.upload(image.path, {
+            resource_type: "image",
+            folder: "products",
+          });
+          return res.secure_url;
+        })
+      );
+
+      // Replace old images with new ones
+      product.image = newImagesUrl;
+    }
+
+    // Save the updated product
+    await product.save();
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Product Updated Successfully!!",
+        updatedProduct: product,
+      });
+  } catch (error) {
+    console.log("Error in editProduct controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
+
 // Get single Product
 const getProduct = async (req, res) => {
   try {
@@ -128,4 +195,10 @@ const getProduct = async (req, res) => {
   }
 };
 
-module.exports = { addProduct, listProducts, removeProduct, getProduct };
+module.exports = {
+  addProduct,
+  listProducts,
+  removeProduct,
+  editProduct,
+  getProduct,
+};

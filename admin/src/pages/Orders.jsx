@@ -24,7 +24,7 @@ const Orders = ({ token }) => {
       const res = await getAllOrders(searchTerm, currentPage, token);
 
       if (res.data.success) {
-        setOrders(res.data.allOrders);
+        setOrders(res.data.ordersAdmin);
         // console.log("All orders are: ", res.data.allOrders);
         setTotalPages(res.data.totalPages);
         // console.log("Total Pages: ", res.data.totalPages);
