@@ -2,96 +2,66 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { assets } from "../constants/index";
 import ProductItem from "../components/ProductItem";
+import axios from "axios";
+import { backendUrl } from "../../../admin/src/constants";
 
 const Collection = () => {
-  const [showFilter, setShowFilter] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFilter, setShowFilter] = useState(false); // Declare showFilter state
   const [categoryFilter, setCategoryFilter] = useState([]);
   const [typeFilter, setTypeFilter] = useState([]);
   const [sortType, setSortType] = useState("relevant");
 
-  const products = useSelector((state) => state.products.list);
   const search = useSelector((state) => state.search.search);
   const showSearch = useSelector((state) => state.search.showSearch);
 
-  const toggleCategoryFilter = (e) => {
-    if (categoryFilter.includes(e.target.value)) {
-      setCategoryFilter((prev) =>
-        prev.filter((item) => item !== e.target.value)
+  // Fetch products based on filters
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      if (showSearch && search) queryParams.append("q", search);
+      if (categoryFilter.length > 0)
+        queryParams.append("category", categoryFilter.join(","));
+      if (typeFilter.length > 0)
+        queryParams.append("subcategory", typeFilter.join(","));
+      if (sortType !== "relevant") queryParams.append("sort", sortType);
+
+      // Make API call
+      const res = await axios.get(
+        `${backendUrl}/api/product/list?${queryParams.toString()}`
       );
-    } else {
-      setCategoryFilter((prev) => [...prev, e.target.value]);
-    }
-  };
-
-  const toggleTypeFilter = (e) => {
-    if (typeFilter.includes(e.target.value)) {
-      setTypeFilter((prev) => prev.filter((item) => item !== e.target.value));
-    } else {
-      setTypeFilter((prev) => [...prev, e.target.value]);
-    }
-  };
-
-  const applyFilter = () => {
-    let productsCopy = products.slice();
-
-    if (showSearch && search) {
-      productsCopy = productsCopy.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    if (categoryFilter.length > 0) {
-      productsCopy = productsCopy.filter((item) =>
-        categoryFilter.includes(item.category)
-      );
-    }
-
-    if (typeFilter.length > 0) {
-      productsCopy = productsCopy.filter((item) =>
-        typeFilter.includes(item.subCategory)
-      );
-    }
-
-    setFilterProducts(productsCopy);
-  };
-
-  const sortPoducts = () => {
-    let filterProductsCopy = filterProducts.slice();
-
-    switch (sortType) {
-      case "low-to-high":
-        setFilterProducts(filterProductsCopy.sort((a, b) => a.price - b.price));
-        break;
-
-      case "high-to-low":
-        setFilterProducts(filterProductsCopy.sort((a, b) => b.price - a.price));
-        break;
-
-      default:
-        applyFilter();
-        break;
+      console.log("Query Params:", queryParams.toString());
+      if (res.data.success) {
+        setProducts(res.data.allProducts); // Use allProducts for frontend
+      } else {
+        console.error("Error fetching products:", res.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    applyFilter();
-  }, [categoryFilter, typeFilter, search, showSearch, products]);
-
-  useEffect(() => {
-    sortPoducts();
-  }, [sortType]);
+    fetchProducts();
+  }, [search, showSearch, categoryFilter, typeFilter, sortType]);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t ">
+    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
       {/* Search Filters */}
       <div className="min-w-60">
         <p
-          onClick={() => setShowFilter(!showFilter)}
+          onClick={() => setShowFilter(!showFilter)} // Toggle filter visibility
           className="text-xl my-2 flex items-center gap-2 cursor-pointer"
         >
           FILTERS
           <img
-            className={`h-3 sm:hidden ${showFilter ? "rotate-90" : ""}`}
+            className={`h-3 sm:hidden ${showFilter ? "rotate-90" : ""}`} // Rotate icon when expanded
             src={assets.dropdown_icon}
             alt=""
           />
@@ -100,82 +70,68 @@ const Collection = () => {
         {/* Categories */}
         <div
           className={`border border-gray-400 pl-5 py-3 mt-6 ${
-            showFilter ? " " : "hidden"
+            showFilter ? "block" : "hidden" // Show/hide based on showFilter
           } sm:block`}
         >
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-800">
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Men`}
-                onChange={toggleCategoryFilter}
-              />
-              Men
-            </p>
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Women`}
-                onChange={toggleCategoryFilter}
-              />
-              Women
-            </p>
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Kids`}
-                onChange={toggleCategoryFilter}
-              />
-              Kids
-            </p>
+            {["Men", "Women", "Kids"].map((category) => (
+              <p key={category} className="flex gap-2">
+                <input
+                  type="checkbox"
+                  className="w-3"
+                  value={category}
+                  checked={categoryFilter.includes(category)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setCategoryFilter((prev) => [...prev, category]);
+                    } else {
+                      setCategoryFilter((prev) =>
+                        prev.filter((item) => item !== category)
+                      );
+                    }
+                  }}
+                />
+                {category}
+              </p>
+            ))}
           </div>
         </div>
 
         {/* Types */}
         <div
           className={`border border-gray-400 pl-5 py-3 my-5 ${
-            showFilter ? " " : "hidden"
+            showFilter ? "block" : "hidden" // Show/hide based on showFilter
           } sm:block`}
         >
           <p className="mb-3 text-sm font-medium">TYPES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-800">
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Topwear`}
-                onChange={toggleTypeFilter}
-              />
-              Topwear
-            </p>
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Bottomwear`}
-                onChange={toggleTypeFilter}
-              />
-              Bottomwear
-            </p>
-            <p className="flex gap-2">
-              <input
-                type="checkbox"
-                className="w-3"
-                value={`Winterwear`}
-                onChange={toggleTypeFilter}
-              />
-              Winterwear
-            </p>
+            {["Topwear", "Bottomwear", "Winterwear"].map((type) => (
+              <p key={type} className="flex gap-2">
+                <input
+                  type="checkbox"
+                  className="w-3"
+                  value={type}
+                  checked={typeFilter.includes(type)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setTypeFilter((prev) => [...prev, type]);
+                    } else {
+                      setTypeFilter((prev) =>
+                        prev.filter((item) => item !== type)
+                      );
+                    }
+                  }}
+                />
+                {type}
+              </p>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Product Collection */}
-      <div className="flex-1 ">
+      <div className="flex-1">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <div className="inline-flex gap-2 items-center mb-3">
             <p className="text-gray-500">
@@ -183,31 +139,34 @@ const Collection = () => {
             </p>
             <p className="w-8 sm:w-12 h-[1.5px] sm:h-[2px] bg-gray-700"></p>
           </div>
-          {/* Product Sorting */}
+          {/* Sorting Dropdown */}
           <select
+            value={sortType}
             onChange={(e) => setSortType(e.target.value)}
-            className="border-2 border-gray-400 text-sm p-2  "
+            className="border-2 border-gray-400 text-sm p-2"
           >
-            <option value="relevant">Sort by: relevant</option>
-            <option value="low-to-high">Sort by: Low to high</option>
-            <option value="high-to-low">Sort by: High to low</option>
+            <option value="relevant">Sort by: Relevant</option>
+            <option value="low-to-high">Sort by: Low to High</option>
+            <option value="high-to-low">Sort by: High to Low</option>
           </select>
         </div>
 
         {/* Show all products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {products?.map((product, index) => (
-            <ProductItem
-              key={index}
-              id={product?._id}
-              image={product?.image}
-              name={product?.name}
-              price={product?.price}
-            />
-          ))}
+          {products.length > 0 ? (
+            products.map((product, index) => (
+              <ProductItem
+                key={index}
+                id={product._id}
+                image={product.image}
+                name={product.name}
+                price={product.price}
+              />
+            ))
+          ) : (
+            <p>No products found.</p>
+          )}
         </div>
-
-        {/* Pagination */}
       </div>
     </div>
   );

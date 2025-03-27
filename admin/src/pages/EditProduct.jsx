@@ -39,7 +39,6 @@ const EditProduct = ({ token }) => {
       setIsLoading(true);
       const res = await updateProduct(id, formData, token);
 
-      //
       if (res.data.success) {
         toast.success(res.data.message);
         navigate("/list-products");

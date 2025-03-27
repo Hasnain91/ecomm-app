@@ -4,7 +4,7 @@ export const highlightSearchTerm = (text, term) => {
   const regex = new RegExp(`(${term})`, "gi"); // Case-insensitive match
   return text.split(regex).map((part, index) =>
     regex.test(part) ? (
-      <span key={index} className="bg-pink-300 font-medium text-pink-950">
+      <span key={index} className="bg-pink-300 font-bold text-pink-600">
         {part}
       </span>
     ) : (

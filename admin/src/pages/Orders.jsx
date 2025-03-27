@@ -68,7 +68,7 @@ const Orders = ({ token }) => {
           <h3>Orders Page</h3>
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search orders..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)} // Update search term
             className="px-4 py-2 border bg-gray-50 border-gray-300 rounded-md w-96 focus:outline-none focus:shadow-2xl focus:shadow-gray-500 focus:border-gray-500 transition"

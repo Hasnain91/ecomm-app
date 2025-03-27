@@ -61,41 +61,116 @@ const addProduct = async (req, res) => {
 };
 
 // get all Products
+// const listProducts = async (req, res) => {
+//   try {
+//     const { q, page = 1, limit = 10 } = req.query;
+//     let query = {};
+
+//     if (q) {
+//       query = {
+//         $or: [
+//           { name: { $regex: q, $options: "i" } },
+//           { category: { $regex: q, $options: "i" } },
+//         ],
+//       };
+//     }
+
+//     let skip = (page - 1) * limit;
+
+//     if (skip < 0) skip = 0;
+
+//     const productsAdmin = await Product.find(query)
+//       .skip(skip)
+//       .limit(Number(limit));
+
+//     const allProducts = await Product.find({});
+
+//     const totalProducts = await Product.countDocuments(query);
+//     res.status(200).json({
+//       success: true,
+//       productsAdmin,
+//       allProducts,
+//       totalProducts,
+//       currentPage: Number(page),
+//       totalPages: Math.ceil(totalProducts / limit),
+//     });
+//   } catch (error) {
+//     console.log("Error in listProducts controller: ", error);
+//     res.status(500).json({ success: false, message: error?.message });
+//   }
+// };
 const listProducts = async (req, res) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
+    const {
+      q, // Search query
+      page = 1, // Pagination page number
+      limit = 10, // Pagination limit
+      category, // Filter by category
+      subcategory, // Filter by subcategory
+
+      sort, // Sorting option
+    } = req.query;
+
+    // Build the filter object for frontend
     let query = {};
 
+    // Apply search query (q)
     if (q) {
-      query = {
-        $or: [
-          { name: { $regex: q, $options: "i" } },
-          { category: { $regex: q, $options: "i" } },
-        ],
-      };
+      query.$or = [
+        { name: { $regex: q, $options: "i" } }, // Match product name
+        { category: { $regex: q, $options: "i" } }, // Match category
+        { subCategory: { $regex: q, $options: "i" } }, // Match subcategory
+      ];
     }
 
-    let skip = (page - 1) * limit;
+    // Apply category filter
+    if (category) {
+      query.category = category;
+    }
 
+    // Apply subcategory filter
+    if (subcategory) {
+      query.subCategory = subcategory;
+    }
+
+    // Pagination logic
+    let skip = (page - 1) * limit;
     if (skip < 0) skip = 0;
 
-    const productsAdmin = await Product.find(query)
+    // Fetch products based on the query
+    const productsAdmin = await Product.find(query) // Admin uses this without pagination
       .skip(skip)
       .limit(Number(limit));
 
-    const allProducts = await Product.find({});
+    const allProducts = await Product.find(query); // Frontend uses this
 
     const totalProducts = await Product.countDocuments(query);
+
+    // Apply sorting for frontend
+    if (sort) {
+      switch (sort) {
+        case "low-to-high":
+          allProducts.sort((a, b) => a.price - b.price);
+          break;
+        case "high-to-low":
+          allProducts.sort((a, b) => b.price - a.price);
+          break;
+        default:
+          break;
+      }
+    }
+
+    // Send the response
     res.status(200).json({
       success: true,
-      productsAdmin,
-      allProducts,
-      totalProducts,
-      currentPage: Number(page),
-      totalPages: Math.ceil(totalProducts / limit),
+      productsAdmin, // For admin use
+      allProducts, // For frontend use
+      totalProducts, // Total number of products matching the query
+      currentPage: Number(page), // Current page number
+      totalPages: Math.ceil(totalProducts / limit), // Total pages for pagination
     });
   } catch (error) {
-    console.log("Error in listProducts controller: ", error);
+    console.error("Error in listProducts controller:", error);
     res.status(500).json({ success: false, message: error?.message });
   }
 };
