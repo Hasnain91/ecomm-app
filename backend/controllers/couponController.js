@@ -3,8 +3,14 @@ const Coupon = require("../models/couponModel");
 // add a coupon to the db
 const addCoupon = async (req, res) => {
   try {
-    const { code, discountType, discountValue, minPurchase, expiryDate } =
-      req.body;
+    const {
+      code,
+      discountType,
+      discountValue,
+      isActive,
+      minPurchase,
+      expiryDate,
+    } = req.body;
 
     // Validate required fields
     if (!code || !discountType || !discountValue || !expiryDate) {
@@ -26,6 +32,7 @@ const addCoupon = async (req, res) => {
       code,
       discountType,
       discountValue,
+      isActive,
       minPurchase: minPurchase || 0, // Default to 0 if not provided
       expiryDate,
     });
@@ -106,9 +113,98 @@ const getCoupons = async (req, res) => {
   }
 };
 
+//Get single  coupon
+const getCoupon = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const coupon = await Coupon.findById(id);
+
+    if (!coupon) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Coupon Not Found" });
+    }
+
+    res.status(200).json({ success: true, coupon });
+  } catch (error) {
+    console.error("Error getting coupons:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Apply a coupon
+
+const applyCoupon = async (req, res) => {
+  try {
+    const { code, cartTotal } = req.body;
+
+    // Validate required fields
+    if (!code || !cartTotal) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Coupon code and cart total are required",
+        });
+    }
+
+    // Find the coupon in the database
+    const coupon = await Coupon.findOne({ code });
+    if (!coupon) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid coupon code" });
+    }
+
+    // Check if the coupon is active and not expired
+    if (!coupon.isActive || new Date() > coupon.expiryDate) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Coupon is expired or inactive" });
+    }
+
+    // Check if the cart total meets the minimum purchase requirement
+    if (cartTotal < coupon.minPurchase) {
+      return res.status(400).json({
+        success: false,
+        message: `Minimum cart amount of $${coupon.minPurchase} required to apply this coupon`,
+      });
+    }
+
+    // Calculate the discount
+    let discount = 0;
+    if (coupon.discountType === "percentage") {
+      discount = (cartTotal * coupon.discountValue) / 100;
+    } else if (coupon.discountType === "fixed") {
+      discount = coupon.discountValue;
+    }
+
+    // Calculate the new total
+    const newTotal = cartTotal - discount;
+
+    // Return the response
+    res.status(200).json({
+      success: true,
+      message: "Coupon applied successfully",
+      coupon: {
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        discountAmount: discount,
+      },
+      newTotal,
+    });
+  } catch (error) {
+    console.error("Error applying coupon:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addCoupon,
   deleteCoupon,
   updateCoupon,
   getCoupons,
+  getCoupon,
+  applyCoupon,
 };

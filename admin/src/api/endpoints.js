@@ -93,3 +93,90 @@ export const adminLogin = async (credentials) => {
   );
   return response;
 };
+
+/////////////////////////////////////////////////////////
+// ***************** Coupon APIs***********************
+/////////////////////////////////////////////////////////
+
+// Add a coupon
+export const addCoupon = async (couponData, token) => {
+  try {
+    const res = await axios.post(`${backendUrl}/api/coupon/add`, couponData, {
+      headers: { token },
+    });
+    return res;
+  } catch (error) {
+    console.error("Error adding coupon:", error);
+    throw error;
+  }
+};
+
+// Fetch all coupons (with pagination)
+export const getAllCoupons = async (token) => {
+  try {
+    const res = await axios.get(`${backendUrl}/api/coupon/all`, {
+      headers: { token },
+    });
+    return res;
+  } catch (error) {
+    console.error("Error fetching coupons:", error);
+    throw error;
+  }
+};
+
+// Update an existing coupon
+export const updateCoupon = async (couponId, updatedData, token) => {
+  try {
+    const res = await axios.put(
+      `${backendUrl}/api/coupon/update/${couponId}`,
+      updatedData,
+      { headers: { token } }
+    );
+    return res;
+  } catch (error) {
+    console.error("Error updating coupon:", error);
+    throw error;
+  }
+};
+
+// Delete a coupon
+export const deleteCoupon = async (couponId, token) => {
+  try {
+    const res = await axios.delete(
+      `${backendUrl}/api/coupon/delete/${couponId}`,
+      {
+        headers: { token },
+      }
+    );
+    return res;
+  } catch (error) {
+    console.error("Error deleting coupon:", error);
+    throw error;
+  }
+};
+
+// Get a single coupon
+export const getCoupon = async (id, token) => {
+  try {
+    const res = await axios.get(`${backendUrl}/api/coupon/${id}`, {
+      headers: { token },
+    });
+    return res;
+  } catch (error) {
+    console.error("Error deleting coupon:", error);
+    throw error;
+  }
+};
+// export const applyCoupon = async (code, cartTotal) => {
+//   try {
+//     const res = await axios.get(
+//       `${backendUrl}/api/coupon/apply`,
+//       code,
+//       cartTotal
+//     );
+//     return res;
+//   } catch (error) {
+//     console.error("Error deleting coupon:", error);
+//     throw error;
+//   }
+// };

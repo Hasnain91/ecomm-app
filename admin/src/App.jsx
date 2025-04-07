@@ -11,6 +11,9 @@ import Orders from "./pages/orders";
 import { useEffect } from "react";
 import Users from "./pages/Users";
 import EditProduct from "./pages/EditProduct";
+import ListCoupons from "./pages/ListCoupons";
+import AddCoupon from "./pages/AddCoupon";
+import EditCoupon from "./pages/EditCoupon";
 
 const App = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -59,6 +62,18 @@ const App = () => {
                 <Route
                   path="/edit-product/:id"
                   element={<EditProduct token={token} />}
+                />
+                <Route
+                  path="/coupons"
+                  element={<ListCoupons token={token} />}
+                />
+                <Route
+                  path="/add-coupon"
+                  element={<AddCoupon token={token} />}
+                />
+                <Route
+                  path="/edit-coupon/:id"
+                  element={<EditCoupon token={token} />}
                 />
               </Routes>
             </div>

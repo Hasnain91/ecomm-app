@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Users, ShoppingBag, Package } from "lucide-react";
+import { Users, ShoppingBag, Package, TicketPercent } from "lucide-react";
 import { assets } from "../assets/assets";
 const Sidebar = () => {
   return (
@@ -17,7 +17,7 @@ const Sidebar = () => {
         >
           {/* <img className="size-5" src={assets.order_icon} alt="" /> */}
           <ShoppingBag className="size-5" />
-          <p className="hidden md:block">List Items</p>
+          <p className="hidden md:block">List Products</p>
         </NavLink>
         <NavLink
           to="/orders"
@@ -45,6 +45,20 @@ const Sidebar = () => {
         >
           <Users className="size-5" />
           <p className="hidden md:block">Users</p>
+        </NavLink>
+        <NavLink
+          to="/coupons"
+          className={({ isActive }) =>
+            `flex items-center gap-3  border-r-0 px-3 py-2 rounded-lg ${
+              isActive
+                ? "border border-pink-700 bg-pink-200"
+                : " border border-gray-300"
+            }`
+          }
+        >
+          {/* <X className="size-5" /> */}
+          <TicketPercent />
+          <p className="hidden md:block">Coupons</p>
         </NavLink>
       </div>
     </div>

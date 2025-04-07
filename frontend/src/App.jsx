@@ -29,7 +29,7 @@ const App = () => {
 
   useEffect(() => {
     if (!user) {
-      console.log("⏳ Waiting for user data...");
+      // console.log("⏳ Waiting for user data...");
       return;
     }
     if (user) {
