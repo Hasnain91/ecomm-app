@@ -6,7 +6,7 @@ const { getIo } = require("../config/socket"); // Import the socket instance
 const { updateOrderStatus } = require("../../admin/src/api/endpoints");
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET);
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1w" });
 };
 
 // Registrations --> Sign Up user

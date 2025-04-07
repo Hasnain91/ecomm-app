@@ -140,12 +140,10 @@ const applyCoupon = async (req, res) => {
 
     // Validate required fields
     if (!code || !cartTotal) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Coupon code and cart total are required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Coupon code and cart total are required",
+      });
     }
 
     // Find the coupon in the database

@@ -4,7 +4,6 @@
 // import { useNavigate } from "react-router-dom";
 // import { useSelector, useDispatch } from "react-redux";
 // import { getCartAmount } from "../redux/features/cartSlice";
-
 // import axios from "axios";
 // import toast from "react-hot-toast";
 // import { Loader2 } from "lucide-react";
@@ -13,6 +12,11 @@
 
 // const PlaceOrder = () => {
 //   const [paymentMethod, setPaymentMethod] = useState("cod");
+//   const [couponCode, setCouponCode] = useState(""); // Coupon code entered by the user
+//   const [appliedCoupon, setAppliedCoupon] = useState(null); // Details of the applied coupon
+//   const [discountedTotal, setDiscountedTotal] = useState(0); // Updated total after applying coupon
+//   const [isLoading, setIsLoading] = useState(false); // Loading state for API calls
+
 //   const navigate = useNavigate();
 //   const dispatch = useDispatch();
 
@@ -29,6 +33,32 @@
 //     handleSubmit,
 //     formState: { errors, isSubmitting },
 //   } = useForm();
+
+//   // Handle coupon application
+//   const handleApplyCoupon = async () => {
+//     try {
+//       setIsLoading(true);
+
+//       const res = await axios.post(
+//         `${baseUrl}/api/coupon/apply`,
+//         { code: couponCode, cartTotal },
+//         { headers: { token } }
+//       );
+
+//       if (res.data.success) {
+//         setAppliedCoupon(res.data.coupon); // Store applied coupon details
+//         setDiscountedTotal(res.data.newTotal); // Update total with discount
+//         toast.success("Coupon applied successfully");
+//       } else {
+//         toast.error(res.data.message);
+//       }
+//     } catch (error) {
+//       console.error("Error applying coupon:", error);
+//       toast.error(error.response?.data?.message || "Failed to apply coupon");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
 
 //   const onSubmit = async (formData) => {
 //     if (!token) {
@@ -58,7 +88,8 @@
 //       let orderData = {
 //         address: formData,
 //         items: orderItems,
-//         amount: cartTotal + delivery_fee,
+//         amount: discountedTotal || cartTotal + delivery_fee, // Use discounted total if available
+//         coupon: appliedCoupon?.code, // Include applied coupon code
 //       };
 
 //       switch (paymentMethod) {
@@ -85,7 +116,9 @@
 //             localStorage.removeItem("cart");
 //             window.location.replace(session_url);
 //           } else {
-//             toast.error(res.data.message);
+//             toast.error(
+//               `Error in placing order with stripe - ${res.data.message}`
+//             );
 //           }
 //           break;
 //         }
@@ -115,6 +148,7 @@
 //             <p className="w-8 sm:w-12 h-[1.5px] sm:h-[2px] bg-gray-700"></p>
 //           </div>
 //         </div>
+//         {/* Delivery Information Fields */}
 //         <div className="flex gap-3">
 //           <input
 //             {...register("firstName", { required: "First Name is required" })}
@@ -137,7 +171,7 @@
 //             <p className="text-red-500 ">{errors.lastName.message}</p>
 //           )}
 //         </div>
-
+//         {/* Email Field */}
 //         <input
 //           {...register("email", {
 //             required: "Email is required",
@@ -151,7 +185,7 @@
 //           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
 //         />
 //         {errors.email && <p className="text-red-500">{errors.email.message}</p>}
-
+//         {/* Street Address Field */}
 //         <input
 //           {...register("street", { required: "Street Address is required" })}
 //           type="text"
@@ -161,7 +195,7 @@
 //         {errors.street && (
 //           <p className="text-red-500">{errors.street.message}</p>
 //         )}
-
+//         {/* City and State Fields */}
 //         <div className="flex gap-3">
 //           <input
 //             {...register("city", { required: "City is required" })}
@@ -178,6 +212,7 @@
 //         </div>
 //         {errors.city && <p className="text-red-500">{errors.city.message}</p>}
 //         {errors.state && <p className="text-red-500">{errors.state.message}</p>}
+//         {/* Country and Zip Code Fields */}
 //         <div className="flex gap-3">
 //           <input
 //             {...register("country", { required: "Country is required" })}
@@ -200,7 +235,7 @@
 //         {errors.country && (
 //           <p className="text-red-500">{errors.country.message}</p>
 //         )}
-
+//         {/* Phone Field */}
 //         <input
 //           {...register("phone", {
 //             required: "Phone number is required",
@@ -214,8 +249,36 @@
 
 //       {/* RIGHT Side */}
 //       <div className="mt-8">
+//         {/* Coupon Section */}
+//         <div className="mb-6">
+//           <p className="text-lg font-semibold mb-2">Apply Coupon</p>
+//           <div className="flex gap-3 items-center">
+//             <input
+//               type="text"
+//               placeholder="Enter coupon code"
+//               value={couponCode}
+//               onChange={(e) => setCouponCode(e.target.value)}
+//               className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
+//             />
+//             <button
+//               onClick={handleApplyCoupon}
+//               disabled={isLoading}
+//               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+//             >
+//               {isLoading ? "Applying..." : "Apply"}
+//             </button>
+//           </div>
+//           {appliedCoupon && (
+//             <p className="text-green-600 mt-2">
+//               Coupon Applied: {appliedCoupon.discountValue}{" "}
+//               {appliedCoupon.discountType === "percentage" ? "%" : "$"} off
+//             </p>
+//           )}
+//         </div>
+
+//         {/* Cart Total Section */}
 //         <div className="mt-8 min-w-90">
-//           <CartTotal />
+//           <CartTotal discountedTotal={discountedTotal} />
 //         </div>
 
 //         <div className="mt-12">
@@ -282,7 +345,6 @@
 // };
 
 // export default PlaceOrder;
-
 import React, { useState } from "react";
 import CartTotal from "../components/CartTotal";
 import { assets, baseUrl } from "../constants/index";
@@ -379,6 +441,7 @@ const PlaceOrder = () => {
 
       switch (paymentMethod) {
         case "cod": {
+          console.log("Token being sent:", token);
           const res = await placeOrderCOD(orderData, token);
 
           if (res.data.success) {
@@ -393,6 +456,7 @@ const PlaceOrder = () => {
           break;
         }
         case "stripe": {
+          console.log("Token being sent:", token);
           const res = await placeOrderStripe(orderData, token);
 
           if (res.data.success) {
@@ -628,3 +692,4 @@ const PlaceOrder = () => {
 };
 
 export default PlaceOrder;
+9;

@@ -42,11 +42,11 @@ const Orders = ({ token }) => {
   useEffect(() => {
     setCurrentPage(1);
     fetchAllOrders();
-  }, [searchTerm]);
+  }, [searchTerm, currentPage, token]);
 
-  useEffect(() => {
-    fetchAllOrders();
-  }, [currentPage, token]);
+  // useEffect(() => {
+  //   fetchAllOrders();
+  // }, [currentPage, token]);
 
   const handleOrderStatus = async (e, orderId) => {
     try {
@@ -57,9 +57,19 @@ const Orders = ({ token }) => {
       }
     } catch (error) {
       console.log("Error in handleOrderStatus :", error);
-      toast.error(error.response?.data?.message);
+      toast.error(
+        error.response?.data?.message || "Failed to uodate order status"
+      );
     }
   };
+
+  if (orders.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-500">No orders found.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -76,7 +86,7 @@ const Orders = ({ token }) => {
         </div>
 
         <div>
-          {orders.map((order, index) => (
+          {[...orders].reverse().map((order, index) => (
             <div
               className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-500 p-5 md:p-8 my-3 md:my-4 text-sm sm:text-base text-gray-700"
               key={index}
