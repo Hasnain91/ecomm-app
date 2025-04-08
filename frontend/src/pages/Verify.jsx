@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { baseUrl } from "../constants";
 import { verifyPayment as verifyPaymentAPI } from "../api/endpoints";
 
 const Verify = () => {
@@ -27,8 +25,9 @@ const Verify = () => {
       const paymentData = { success, orderId };
 
       const res = await verifyPaymentAPI(paymentData, token);
+      // console.log("Response for Verify Payment: ", res);
 
-      if (res.data.success) {
+      if (res.success) {
         dispatch({ type: "cart/clearCart" });
         navigate("/orders");
         toast.success("Payment verified successfully!");

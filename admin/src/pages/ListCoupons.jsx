@@ -11,7 +11,6 @@ const ListCoupons = ({ token }) => {
   const [couponList, setCouponList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCoupon, setSelectedCoupon] = useState(null);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchCoupons = async () => {
@@ -20,8 +19,6 @@ const ListCoupons = ({ token }) => {
       const res = await getAllCoupons(token);
 
       if (res.data.success) {
-        console.log("Coupons from db:");
-        console.log(res.data.coupons);
         setCouponList(res.data.coupons);
       } else {
         toast.error(res.data.message);
@@ -64,21 +61,23 @@ const ListCoupons = ({ token }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <p className="text-xl font-semibold">All Coupons</p>
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <p className="text-xl font-semibold text-gray-800">All Coupons</p>
 
         {/* Add Coupon Button */}
         <button
           onClick={() => navigate("/add-coupon")}
-          className="bg-gray-900 text-gray-100 px-3 py-2 cursor-pointer rounded hover:opacity-70"
+          className="mt-4 md:mt-0 bg-gray-900 text-gray-100 px-4 py-2 rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-gray-700"
         >
           Add New Coupon
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
-        {/* List table Title */}
-        <div className="hidden md:grid grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr_1fr] items-center py-2 px-4 border bg-gray-100 text-base">
+      {/* Coupons List */}
+      <div className="flex flex-col gap-4">
+        {/* Table Header (Hidden on Mobile) */}
+        <div className="hidden md:grid grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr_1fr] items-center py-2 px-4 border bg-gray-100 text-sm font-medium text-gray-700">
           <b>Code</b>
           <b>Discount Type</b>
           <b>Value</b>
@@ -87,31 +86,73 @@ const ListCoupons = ({ token }) => {
           <b className="text-center">Action</b>
         </div>
 
-        {/* Coupons List */}
+        {/* Coupons List Items */}
         {couponList.length > 0 ? (
           couponList.map((coupon, index) => (
             <div
-              className="grid grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr_1fr] items-center gap-2 py-2 px-4 border text-base"
               key={index}
+              className="grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr_1fr] grid-cols-1 gap-4 py-4 px-4 border rounded-md shadow-sm bg-white text-sm text-gray-700"
             >
-              <p>{coupon.code}</p>
-              <p>{coupon.discountType}</p>
-              <p>{coupon.discountValue}</p>
-              <p>{coupon.isActive ? "Active" : "Not Active"}</p>
-              <p>{new Date(coupon.expiryDate).toLocaleDateString()}</p>
-              <div className="flex justify-center gap-3 place-self-center">
-                <p
+              {/* Mobile View */}
+              <div className="md:hidden flex flex-col gap-2">
+                <p>
+                  <span className="font-medium">Code:</span> {coupon.code}
+                </p>
+                <p>
+                  <span className="font-medium">Discount Type:</span>{" "}
+                  {coupon.discountType}
+                </p>
+                <p>
+                  <span className="font-medium">Value:</span>{" "}
+                  {coupon.discountValue}
+                </p>
+                <p>
+                  <span className="font-medium">Status:</span>{" "}
+                  {coupon.isActive ? "Active" : "Not Active"}
+                </p>
+                <p>
+                  <span className="font-medium">Expiry Date:</span>{" "}
+                  {new Date(coupon.expiryDate).toLocaleDateString()}
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => navigate(`/edit-coupon/${coupon._id}`)}
+                    className="text-green-500 hover:text-green-700"
+                  >
+                    <Pencil size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(coupon)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Desktop View */}
+              <p className="hidden md:block">{coupon.code}</p>
+              <p className="hidden md:block">{coupon.discountType}</p>
+              <p className="hidden md:block">{coupon.discountValue}</p>
+              <p className="hidden md:block">
+                {coupon.isActive ? "Active" : "Not Active"}
+              </p>
+              <p className="hidden md:block">
+                {new Date(coupon.expiryDate).toLocaleDateString()}
+              </p>
+              <div className="hidden md:flex justify-center gap-3">
+                <button
                   onClick={() => navigate(`/edit-coupon/${coupon._id}`)}
-                  className="text-green-400 cursor-pointer text-lg font-bold"
+                  className="text-green-500 hover:text-green-700"
                 >
-                  <Pencil />
-                </p>
-                <p
+                  <Pencil size={18} />
+                </button>
+                <button
                   onClick={() => handleDeleteClick(coupon)}
-                  className="text-red-400 cursor-pointer text-lg font-bold"
+                  className="text-red-500 hover:text-red-700"
                 >
-                  <Trash />
-                </p>
+                  <Trash size={18} />
+                </button>
               </div>
             </div>
           ))
@@ -120,21 +161,24 @@ const ListCoupons = ({ token }) => {
         )}
       </div>
 
+      {/* Delete Confirmation Modal */}
       <DeleteModal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <h2 className="text-xl font-bold tracking-wider mb-4">
+        <h2 className="text-lg md:text-xl font-bold tracking-wider mb-4">
           Confirm Deletion
         </h2>
-        <p className="text-lg">Are you sure you want to delete this coupon?</p>
+        <p className="text-sm md:text-base">
+          Are you sure you want to delete this coupon?
+        </p>
         <div className="flex justify-end gap-2 mt-4">
           <button
             onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 bg-gray-200 text-lg font-medium hover:bg-gray-300 rounded-md mr-2 cursor-pointer"
+            className="px-4 py-2 bg-gray-200 text-sm md:text-base font-medium hover:bg-gray-300 rounded-md cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={removeCoupon}
-            className="px-4 py-2 bg-red-500 text-lg font-medium text-gray-50 hover:bg-red-600 rounded-md cursor-pointer"
+            className="px-4 py-2 bg-red-500 text-sm md:text-base font-medium text-gray-50 hover:bg-red-600 rounded-md cursor-pointer"
           >
             Delete
           </button>

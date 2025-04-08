@@ -74,7 +74,7 @@ const Orders = ({ token }) => {
   return (
     <>
       <div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center flex-wrap gap-2.5 md:gap-0">
           <h3>Orders Page</h3>
           <input
             type="text"

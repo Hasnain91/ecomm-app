@@ -18,7 +18,7 @@ const Orders = () => {
 
       if (res.data.success) {
         let allOrders = [];
-        console.log(res.data.orders);
+        // console.log(res.data.orders);
         res.data.orders.map((order) => {
           order.items.map((item) => {
             item["status"] = order.status;
@@ -36,7 +36,7 @@ const Orders = () => {
       toast.error(error.message);
     }
   };
-  console.log(orders);
+  // console.log(orders);
 
   useEffect(() => {
     fetchOrders();
