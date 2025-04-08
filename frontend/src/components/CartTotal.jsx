@@ -67,8 +67,8 @@ const CartTotal = ({ discountedTotal }) => {
             {/* {(discountedTotal || 0) + delivery_fee} */}
             {/* {(cartTotal || 0) + delivery_fee}.00 */}
             {discountedTotal
-              ? `${(discountedTotal || 0) + delivery_fee}.00`
-              : `${(cartTotal || 0) + delivery_fee}.00`}
+              ? `${(discountedTotal || 0) + delivery_fee}`
+              : `${(cartTotal || 0) + delivery_fee}`}
             {/* {(discountedTotal || 0) + delivery_fee}.00 */}
           </b>
         </div>

@@ -3,9 +3,6 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { fetchUserOrders } from "../api/endpoints";
 
-import axios from "axios";
-import { baseUrl } from "../constants";
-
 const Orders = () => {
   const currency = useSelector((state) => state.config.currency);
   const token = useSelector((state) => state.auth.token);
@@ -21,6 +18,7 @@ const Orders = () => {
 
       if (res.data.success) {
         let allOrders = [];
+        console.log(res.data.orders);
         res.data.orders.map((order) => {
           order.items.map((item) => {
             item["status"] = order.status;
@@ -38,6 +36,7 @@ const Orders = () => {
       toast.error(error.message);
     }
   };
+  console.log(orders);
 
   useEffect(() => {
     fetchOrders();
@@ -61,7 +60,21 @@ const Orders = () => {
             className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
-              <img className="w-16 sm:w-20" src={product?.image[0]} alt="" />
+              <img
+                className="w-16 sm:w-20"
+                // src={product?.image[0]}
+                // src={
+                //   product?.image && Array.isArray(product.image)
+                //     ? product.image[0]
+                //     : "fallback_image_url"
+                // } // Provide a fallback image URL here
+                src={
+                  product?.image && product.image.length > 0
+                    ? product.image[0]
+                    : "fallback_image_url"
+                }
+                alt="Product Image"
+              />
               <div>
                 <p className="sm:text-base font-medium">{product?.name}</p>
                 <div className="flex items-center gap-3 mt-1 text-base text-gray-700">

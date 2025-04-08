@@ -424,6 +424,7 @@ const PlaceOrder = () => {
               products.find((product) => product._id === productId)
             );
             if (itemInfo) {
+              itemInfo.productId = productId;
               itemInfo.size = size;
               itemInfo.quantity = cartItems[productId][size];
               orderItems.push(itemInfo);
@@ -441,7 +442,6 @@ const PlaceOrder = () => {
 
       switch (paymentMethod) {
         case "cod": {
-          console.log("Token being sent:", token);
           const res = await placeOrderCOD(orderData, token);
 
           if (res.data.success) {
@@ -456,7 +456,6 @@ const PlaceOrder = () => {
           break;
         }
         case "stripe": {
-          console.log("Token being sent:", token);
           const res = await placeOrderStripe(orderData, token);
 
           if (res.data.success) {

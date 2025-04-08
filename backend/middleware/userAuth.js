@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.headers.token;
+  let token = req.headers.token;
   // Trim quotes if present
   if (token && token.startsWith('"') && token.endsWith('"')) {
-    receivedToken = token.slice(1, -1); // Remove surrounding quotes
+    token = token.slice(1, -1); // Remove surrounding quotes
   }
   console.log("token received by the backend:", token);
   if (!token) {
