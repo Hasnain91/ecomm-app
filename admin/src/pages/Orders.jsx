@@ -90,6 +90,7 @@ const Orders = ({ token }) => {
             <div
               className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-500 p-5 md:p-8 my-3 md:my-4 text-sm sm:text-base text-gray-700  rounded-md shadow-sm bg-white"
               key={index}
+              data-aos="zoom-in"
             >
               <img
                 className="w-12"

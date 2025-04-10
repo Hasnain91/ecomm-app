@@ -14,6 +14,9 @@ import EditProduct from "./pages/EditProduct";
 import ListCoupons from "./pages/ListCoupons";
 import AddCoupon from "./pages/AddCoupon";
 import EditCoupon from "./pages/EditCoupon";
+// Experimenting with animations
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const App = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -21,6 +24,14 @@ const App = () => {
     ? localStorage.getItem("token")
     : "";
   const [token, setToken] = useState(loadToken);
+
+  // Experimenting with animations
+  useEffect(() => {
+    AOS.init({
+      duration: "1000",
+      once: false,
+    });
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("token", token);

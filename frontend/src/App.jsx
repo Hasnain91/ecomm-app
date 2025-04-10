@@ -20,6 +20,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "./redux/features/authSlice";
 import { backendUrl } from "../../admin/src/constants";
 import { fetchProducts } from "./redux/features/productSlice";
+import Animations from "./pages/Animations";
+
+// Experimenting with animations
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const socket = io(backendUrl);
 
@@ -27,6 +32,14 @@ const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+
+  // Experimenting with animations
+  useEffect(() => {
+    AOS.init({
+      duration: "1000",
+      once: false,
+    });
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -84,6 +97,7 @@ const App = () => {
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/animate" element={<Animations />} />
       </Routes>
       <Footer />
     </div>

@@ -92,6 +92,7 @@ const ListCoupons = ({ token }) => {
             <div
               key={index}
               className="grid md:grid-cols-[1.5fr_1.5fr_1fr_1fr_1fr_1fr] grid-cols-1 gap-4 py-4 px-4 border rounded-md shadow-sm bg-white text-sm text-gray-700"
+              data-aos="zoom-in"
             >
               {/* Mobile View */}
               <div className="md:hidden flex flex-col gap-2">

@@ -16,7 +16,7 @@ export const addProduct = async (formData, token) => {
 
 export const getAllProducts = async (searchTerm, currentPage, token) => {
   const response = await axios.get(`${backendUrl}/api/product/list`, {
-    params: { q: searchTerm, page: currentPage, limit: 10 },
+    params: { q: searchTerm, page: currentPage, limit: 30 },
     headers: { token },
   });
 

@@ -111,6 +111,7 @@ const ListProducts = ({ token }) => {
             <div
               key={index}
               className="grid grid-cols-1 md:grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center gap-2 py-2 px-4 border rounded-md shadow-sm bg-white text-sm md:text-base"
+              data-aos="zoom-in"
             >
               {/* Image */}
               <img
