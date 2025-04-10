@@ -1,6 +1,7 @@
 import React from "react";
 import { assets } from "../constants/index";
 import Newsletter from "../components/Newsletter";
+import { MailIcon, PhoneCallIcon } from "lucide-react";
 
 const Contact = () => {
   return (
@@ -22,18 +23,28 @@ const Contact = () => {
         />
 
         <div className="flex flex-col justify-center items-start gap-6">
-          <p className="font-semibold text-xl text-gray-600">Our Store</p>
-          <p className="text-gray-400">
+          <p className="font-semibold text-xl text-gray-900">Our Store</p>
+          <p className="text-gray-800">
             Shop No 10, 46/A/2, <br /> Shadman Market Lahore, 54000, Pakistan
           </p>
-          <p className="text-gray-400">
-            Tel: +92 300 123456 <br />
-            Email: info@forever.com
+          <p className="text-gray-800">
+            {/* Tel: +92 300 123456 <br />
+            Email: info@forever.com */}
+            <a href="tel:+92300123456" className="hover:underline flex  gap-3">
+              <PhoneCallIcon /> +92 300 123456
+            </a>
+            <br />
+            <a
+              href="mailto:info@forever.com"
+              className="hover:underline flex  gap-3"
+            >
+              <MailIcon /> info@forever.com
+            </a>
           </p>
-          <p className="font-semibold text-xl text-gray-600">
+          <p className="font-semibold text-xl text-gray-900">
             Careers at Forever
           </p>
-          <p className="text-gray-400">
+          <p className="text-gray-800">
             Learn more about our teams and job openings.
           </p>
 

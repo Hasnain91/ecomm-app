@@ -67,7 +67,7 @@ const Users = ({ token }) => {
         <div>
           {users.map((user, index) => (
             <div
-              className="flex flex-col sm:flex-row  gap-3 items-center justify-around border-2 border-gray-500 p-5 md:p-8 my-3 md:my-4 text-sm sm:text-base text-gray-700 place-items-center"
+              className="flex flex-col sm:flex-row  gap-3 items-center justify-around border-2 border-gray-500 p-5 md:p-8 my-3 md:my-4 text-sm sm:text-base text-gray-700 place-items-center  rounded-md shadow-sm bg-white"
               key={index}
             >
               <div className="flex justify-center items-center gap-5">

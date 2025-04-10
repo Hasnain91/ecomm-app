@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import io from "socket.io-client";
 import { useEffect } from "react";
@@ -25,6 +25,7 @@ const socket = io(backendUrl);
 
 const App = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
@@ -41,7 +42,8 @@ const App = () => {
         toast.error("You have been logged out, please contact admin");
 
         dispatch(clearAuth());
-        window.location.href = "/login";
+        // window.location.href = "/login";
+        navigate("/login");
         toast.success(data?.message);
       });
     }

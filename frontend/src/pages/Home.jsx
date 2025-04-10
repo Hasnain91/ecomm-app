@@ -6,13 +6,13 @@ import Policy from "../components/Policy";
 
 const Home = () => {
   return (
-    <div>
+    <>
       <HeroSection />
       <LatestCollection />
       <BestSeller />
       <Policy />
       <Newsletter />
-    </div>
+    </>
   );
 };
 

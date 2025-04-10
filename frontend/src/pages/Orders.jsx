@@ -19,6 +19,7 @@ const Orders = () => {
       if (res.data.success) {
         let allOrders = [];
         // console.log(res.data.orders);
+        // console.log(res.data.orders[0].items);
         res.data.orders.map((order) => {
           order.items.map((item) => {
             item["status"] = order.status;
@@ -60,6 +61,7 @@ const Orders = () => {
             className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
+              {console.log("Current product in loop is: ", product)}
               <img
                 className="w-16 sm:w-20"
                 // src={product?.image[0]}
