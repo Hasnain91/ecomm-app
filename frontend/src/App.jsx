@@ -20,7 +20,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "./redux/features/authSlice";
 import { backendUrl } from "../../admin/src/constants";
 import { fetchProducts } from "./redux/features/productSlice";
-import Animations from "./pages/Animations";
 
 // Experimenting with animations
 import AOS from "aos";
@@ -97,7 +96,6 @@ const App = () => {
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/verify" element={<Verify />} />
-        <Route path="/animate" element={<Animations />} />
       </Routes>
       <Footer />
     </div>

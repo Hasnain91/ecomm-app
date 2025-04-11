@@ -52,10 +52,6 @@ const Navbar = () => {
           <p>CONTACT</p>
           <hr className="w-2/3 h-[1.5px] border-none bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/animate" className="flex flex-col items-center gap-1">
-          <p>ANIMATIONS</p>
-          <hr className="w-2/3 h-[1.5px] border-none bg-gray-700 hidden" />
-        </NavLink>
       </ul>
 
       <div className="flex items-center gap-6">
