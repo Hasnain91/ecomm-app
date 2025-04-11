@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import Verify from "./pages/Verify";
+
 import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "./redux/features/authSlice";
 import { backendUrl } from "../../admin/src/constants";
@@ -24,6 +25,7 @@ import { fetchProducts } from "./redux/features/productSlice";
 // Experimenting with animations
 import AOS from "aos";
 import "aos/dist/aos.css";
+import ContactAdmin from "./pages/ContactAdmin";
 
 const socket = io(backendUrl);
 
@@ -55,7 +57,8 @@ const App = () => {
 
         dispatch(clearAuth());
         // window.location.href = "/login";
-        navigate("/login");
+        // navigate("/login");
+        navigate("/contact-admin");
         toast.success(data?.message);
       });
     }
@@ -96,6 +99,7 @@ const App = () => {
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/verify" element={<Verify />} />
+        <Route path="/contact-admin" element={<ContactAdmin />} />
       </Routes>
       <Footer />
     </div>

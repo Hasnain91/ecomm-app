@@ -10,6 +10,7 @@ const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
 const newsletterRoute = require("./routes/mailRoutes.js");
 const couponRoutes = require("./routes/couponRoutes.js");
+const messageRoutes = require("./routes/messageRoutes.js");
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api/mail", newsletterRoute);
 app.use("/api/coupon", couponRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is working");
