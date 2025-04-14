@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
-import axios from "axios";
-
-import { baseUrl } from "../constants";
 import { LoaderCircle } from "lucide-react";
 import { useSelector } from "react-redux";
+import { sendMessageToAdmin } from "../api/endpoints";
 
 const ContactAdmin = () => {
   const [message, setMessage] = useState(""); // Message input by the user
@@ -23,13 +21,7 @@ const ContactAdmin = () => {
 
     try {
       setIsLoading(true);
-      const res = await axios.post(
-        `${baseUrl}/api/messages/send`, // Backend endpoint for sending messages
-        { message, email }
-        // { headers: { token } } // Include user's token
-      );
-
-      console.log("Token being send from the frontend in ContactAdmin", token);
+      const res = await sendMessageToAdmin(message, email);
 
       if (res.data.success) {
         toast.success("Your message has been sent successfully!");
@@ -43,7 +35,6 @@ const ContactAdmin = () => {
       toast.error(error?.response?.data?.message || "Failed to send message.");
     } finally {
       setIsLoading(false);
-      console.log(`Message sent with token ${token}`);
     }
   };
 

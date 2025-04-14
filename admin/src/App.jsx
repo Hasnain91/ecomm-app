@@ -17,6 +17,7 @@ import EditCoupon from "./pages/EditCoupon";
 // Experimenting with animations
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Messages from "./pages/Messages";
 
 const App = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
@@ -86,6 +87,7 @@ const App = () => {
                   path="/edit-coupon/:id"
                   element={<EditCoupon token={token} />}
                 />
+                <Route path="/messages" element={<Messages token={token} />} />
               </Routes>
             </div>
           </div>

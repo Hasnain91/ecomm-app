@@ -180,3 +180,36 @@ export const getCoupon = async (id, token) => {
 //     throw error;
 //   }
 // };
+
+/////////////////////////////////////////////////////////
+// ***************** Coupon APIs***********************
+/////////////////////////////////////////////////////////
+
+// Get All Messages
+export const getAllMessages = async (token) => {
+  const response = axios.get(`${backendUrl}/api/messages/`, {
+    headers: { token },
+  });
+
+  return response;
+};
+// Update Message Status
+export const updateMessageStatus = async (id, status, token) => {
+  const response = axios.put(
+    `${backendUrl}/api/messages/${id}`,
+    { status },
+    {
+      headers: { token },
+    }
+  );
+
+  return response;
+};
+// Update Message Status
+export const deleteMessage = async (id, token) => {
+  const response = axios.delete(`${backendUrl}/api/messages/${id}`, {
+    headers: { token },
+  });
+
+  return response;
+};

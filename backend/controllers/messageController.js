@@ -39,13 +39,11 @@ const sendMessage = async (req, res) => {
     });
 
     await newMessage.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Message sent successfully.",
-        newMessage,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Message sent successfully.",
+      newMessage,
+    });
   } catch (error) {
     console.log("Error in sendMessage controller: ", error);
     res.status(500).json({
@@ -74,21 +72,60 @@ const getMessages = async (req, res) => {
 const updateMessageStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
+
   try {
-    const message = await Message.findById(id);
-    if (!message) {
-      res.status(404).json({ success: false, message: "Message Not Found!" });
-      //   throw new Error("Message not found.");
+    if (!id || !status) {
+      return res.status(400).json({ success: false, message: "Invalid Input" });
     }
 
-    message.status = status;
-    await message.save();
+    const updatedMessage = await Message.findOneAndUpdate(
+      { _id: id },
+      { status },
+      { new: true }
+    );
 
-    res.status(200).json({ success: true, message: "Message status updated." });
+    if (!updatedMessage) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Message Not Found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Message status updated.",
+      data: updatedMessage,
+    });
   } catch (error) {
     console.log("Error in updateMessageStatus controller: ", error);
     res.status(500).json({ success: false, message: error?.message });
   }
 };
+// @desc    Delete message  (Admin only)
+// @route   DELETE /api/messages/:id
+// @access  Private/Admin
+const deleteMessage = async (req, res) => {
+  const { id } = req.params;
+  //   const { status } = req.body;
+  try {
+    const message = await Message.findById(id);
+    if (!message) {
+      res.status(404).json({ success: false, message: "Message Not Found!" });
+    }
 
-module.exports = { sendMessage, getMessages, updateMessageStatus };
+    await Message.findByIdAndDelete(id);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Message deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteMessage controller: ", error);
+    res.status(500).json({ success: false, message: error?.message });
+  }
+};
+
+module.exports = {
+  sendMessage,
+  getMessages,
+  updateMessageStatus,
+  deleteMessage,
+};

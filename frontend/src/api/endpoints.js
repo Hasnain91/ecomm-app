@@ -66,3 +66,15 @@ export const subscribeToNewsletter = async (email) => {
   const response = await axios.post(`${baseUrl}/api/mail/subscribe`, { email });
   return response;
 };
+
+////////////////////////////////////////////////////////////
+// ****************** MEssages API ****************************
+////////////////////////////////////////////////////////////
+
+export const sendMessageToAdmin = async (message, email) => {
+  const response = await axios.post(`${baseUrl}/api/messages/send`, {
+    message,
+    email,
+  });
+  return response;
+};
