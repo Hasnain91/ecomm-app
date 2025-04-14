@@ -20,7 +20,7 @@ const sendMessage = async (req, res) => {
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "User Not Found" });
+        .json({ success: false, message: "You can't contact admin." });
     }
 
     if (user.status !== "Suspended") {

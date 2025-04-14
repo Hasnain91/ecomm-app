@@ -67,9 +67,10 @@ export const updateOrderStatus = async (orderId, status, token) => {
 // ***************** User APIs***********************
 /////////////////////////////////////////////////////////
 
-export const getAllUsers = async (token) => {
+export const getAllUsers = async (token, searchTerm) => {
   const response = await axios.get(`${backendUrl}/api/user/all-users`, {
     headers: { token },
+    params: { searchTerm },
   });
   return response;
 };

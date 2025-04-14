@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { User2 } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { backendUrl } from "../constants";
 import { getAllUsers, updateUserStatus } from "../api/endpoints";
 updateUserStatus;
 
 const Users = ({ token }) => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch all users from the backend
   const fetchAllUsers = async () => {
@@ -19,7 +18,7 @@ const Users = ({ token }) => {
 
     try {
       setIsLoading(true);
-      const res = await getAllUsers(token);
+      const res = await getAllUsers(token, searchTerm);
 
       if (res.data.success) {
         setUsers(res.data.users);
@@ -36,7 +35,7 @@ const Users = ({ token }) => {
 
   useEffect(() => {
     fetchAllUsers();
-  }, [token]);
+  }, [token, searchTerm]);
 
   const handleUserStatusChange = async (e, userId) => {
     try {
@@ -59,6 +58,16 @@ const Users = ({ token }) => {
   return (
     <div>
       <h3 className="text-xl sm:text-2xl font-semibold mb-6">Users</h3>
+      {/* Search Input */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 bg-white rounded-md outline-none focus:border-blue-500"
+        />
+      </div>
       {isLoading ? (
         <p className="text-center text-gray-500">Loading users...</p>
       ) : users.length === 0 ? (

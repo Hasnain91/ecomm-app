@@ -122,13 +122,13 @@ const Messages = ({ token }) => {
                   {message.userId?.email || "N/A"}
                 </p>
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Status:</span>
+                  <span className="font-medium">Status: </span>
                   <select
-                    value={message.status || "Pending"}
+                    value={message.status}
                     onChange={(e) =>
                       handleStatusChange(message._id, e.target.value)
                     }
-                    className="border border-gray-300 rounded px-2 py-1 text-sm"
+                    className="border border-gray-300 rounded px-2 py-1 text-sm font-semibold bg-gray-200"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Reviewed">Reviewed</option>

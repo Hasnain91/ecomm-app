@@ -114,8 +114,18 @@ const loginUser = async (req, res) => {
 
 // Get All Users
 const getUsers = async (req, res) => {
+  const { searchTerm } = req.query;
   try {
-    const users = await User.find({}).select(" -password");
+    let query = {};
+    if (searchTerm) {
+      query = {
+        $or: [
+          { name: { $regex: searchTerm, $options: "i" } },
+          { email: { $regex: searchTerm, $options: "i" } },
+        ],
+      };
+    }
+    const users = await User.find(query).select("-password");
 
     res.status(200).json({
       success: true,
