@@ -45,7 +45,7 @@ const addProduct = async (req, res) => {
       date: Date.now(),
     };
 
-    console.log(productData);
+    // console.log(productData);
 
     const product = new Product(productData);
 
@@ -61,44 +61,6 @@ const addProduct = async (req, res) => {
 };
 
 // get all Products
-// const listProducts = async (req, res) => {
-//   try {
-//     const { q, page = 1, limit = 10 } = req.query;
-//     let query = {};
-
-//     if (q) {
-//       query = {
-//         $or: [
-//           { name: { $regex: q, $options: "i" } },
-//           { category: { $regex: q, $options: "i" } },
-//         ],
-//       };
-//     }
-
-//     let skip = (page - 1) * limit;
-
-//     if (skip < 0) skip = 0;
-
-//     const productsAdmin = await Product.find(query)
-//       .skip(skip)
-//       .limit(Number(limit));
-
-//     const allProducts = await Product.find({});
-
-//     const totalProducts = await Product.countDocuments(query);
-//     res.status(200).json({
-//       success: true,
-//       productsAdmin,
-//       allProducts,
-//       totalProducts,
-//       currentPage: Number(page),
-//       totalPages: Math.ceil(totalProducts / limit),
-//     });
-//   } catch (error) {
-//     console.log("Error in listProducts controller: ", error);
-//     res.status(500).json({ success: false, message: error?.message });
-//   }
-// };
 const listProducts = async (req, res) => {
   try {
     const {
