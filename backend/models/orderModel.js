@@ -7,6 +7,8 @@ const orderSchema = new mongoose.Schema({
   address: { type: Object, required: true },
   status: { type: String, required: true, default: "Order Placed" },
   paymentMethod: { type: String, required: true },
+  paymentIntentId: { type: String }, // Add this field for Stripe Payment Intent ID
+
   payment: { type: Boolean, required: true, default: false },
   date: { type: Number, required: true },
 });

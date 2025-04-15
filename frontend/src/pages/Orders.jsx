@@ -62,7 +62,7 @@ const Orders = () => {
             data-aos="zoom-in"
           >
             <div className="flex items-start gap-6 text-sm">
-              {console.log("Current product in loop is: ", product)}
+              {/* {console.log("Current product in loop is: ", product)} */}
               <img
                 className="w-16 sm:w-20"
                 // src={product?.image[0]}

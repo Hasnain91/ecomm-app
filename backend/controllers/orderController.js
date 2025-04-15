@@ -101,7 +101,7 @@ const placeOrderStripe = async (req, res) => {
     // 1. Validate items and calculate total securely
     let totalAmount = 0;
     const detailedItems = [];
-    console.log(`items array in the bakend is ${items}`);
+    // console.log(`items array in the bakend is ${items}`);
 
     for (const item of items) {
       const product = await Product.findById(item.productId);
@@ -161,7 +161,17 @@ const placeOrderStripe = async (req, res) => {
       });
     }
 
-    // 4. Create and save order (not yet paid)
+    // 4. Create Payment Intent
+    const stripeAmount = Math.round(totalAmount * 100); // Stripe uses cents
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: stripeAmount,
+      currency: "usd",
+      metadata: {
+        orderId: "temp", // Temporary placeholder; updated after saving the order
+      },
+    });
+
+    // 5. Create and save order (not yet paid)
     const orderData = {
       userId,
       items: detailedItems,
@@ -169,15 +179,22 @@ const placeOrderStripe = async (req, res) => {
       address,
       paymentMethod: "Stripe",
       payment: false,
+      paymentIntentId: paymentIntent.id,
       date: Date.now(),
     };
 
     const newOrder = new Order(orderData);
     await newOrder.save();
 
-    // 5. Create Stripe checkout session
-    const stripeAmount = Math.round(totalAmount * 100); // Stripe uses cents
+    // Update the Payment Intent metadata with the actual order ID
+    await stripe.paymentIntents.update(paymentIntent.id, {
+      metadata: { orderId: newOrder._id.toString() },
+    });
+
+    // 6. Create Stripe checkout session
+    // const stripeAmount = Math.round(totalAmount * 100); // Stripe uses cents
     const session = await stripe.checkout.sessions.create({
+      // payment_intent: paymentIntent.id, // Link the Payment Intent to the session
       success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
       line_items: [
@@ -204,9 +221,14 @@ const placeOrderStripe = async (req, res) => {
         },
       ],
       mode: "payment",
+      payment_intent_data: {
+        metadata: {
+          orderId: newOrder._id.toString(), // Attach metadata to the Payment Intent
+        },
+      },
     });
 
-    // 6. Send confirmation email (optional before payment)
+    // 7. Send confirmation email (optional before payment)
     const mailOptions = {
       from: `"FOREVER" <${process.env.EMAIL_USER}>`,
       to: address.email,
@@ -255,7 +277,7 @@ const placeOrderStripe = async (req, res) => {
 
     await transporter.sendMail(mailOptions);
 
-    // 7. Respond with session URL
+    // 8. Respond with session URL
     res.status(200).json({ success: true, session_url: session.url });
   } catch (error) {
     console.error("Error in placeOrderStripe controller:", error);
@@ -283,6 +305,147 @@ const verifyStripe = async (req, res) => {
     res.status(500).json({ success: false, message: error?.message });
   }
 };
+// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+// Cancel Order and Process Refund
+// const cancelOrder = async (req, res) => {
+//   console.log("Cancel Order Controller is hit!!");
+//   const { orderId } = req.body; // Get the order ID from the request body
+//   // const token = req.headers.token; // Ensure the admin is authenticated
+//   console.log("Initiating cancellation for order:", orderId);
+
+//   try {
+//     // Fetch the order from the database
+//     const order = await Order.findById(orderId);
+//     if (!order) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Order not found" });
+//     }
+//     console.log("Order payment method:", order.paymentMethod);
+//     console.log("PaymentIntent ID:", order.paymentIntentId);
+
+//     // Check if the order is already cancelled
+//     if (order.status === "Cancelled") {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Order already cancelled" });
+//     }
+
+//     // Update the order status to "Cancelled"
+//     order.status = "Cancelled";
+//     await order.save();
+
+//     // If the order was paid via Stripe, initiate a refund
+//     if (order.paymentMethod === "stripe" && order.paymentIntentId) {
+//       try {
+//         // Retrieve the payment intent from Stripe
+//         const paymentIntent = await stripe.paymentIntents.retrieve(
+//           order.paymentIntentId
+//         );
+
+//         // Check if the payment intent is eligible for a refund
+//         console.log("Stripe Payment Intent Status:", paymentIntent.status);
+//         if (paymentIntent.status === "succeeded") {
+//           // Create a refund for the payment intent
+//           const refund = await stripe.refunds.create({
+//             payment_intent: order.paymentIntentId,
+//           });
+
+//           // Log the refund details
+//           console.log("Refund created:", refund.id);
+//         }
+//       } catch (stripeError) {
+//         console.error("Stripe refund error:", stripeError);
+//         return res
+//           .status(500)
+//           .json({ success: false, message: "Failed to process refund" });
+//       }
+//     }
+
+//     // Respond with success
+//     res
+//       .status(200)
+//       .json({ success: true, message: "Order cancelled successfully" });
+//   } catch (error) {
+//     console.error("Error in cancelOrder controller:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// };
+
+// Cancel Order and Process Refund
+const cancelOrder = async (req, res) => {
+  const { orderId } = req.body;
+
+  console.log("✅ Hit the route");
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      console.log("❌ Order not found");
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    console.log("🔥 Cancel Order Controller is hit!!");
+    console.log("Initiating cancellation for order:", order._id);
+    console.log("Order payment method:", order.paymentMethod);
+    console.log("PaymentIntent ID:", order.paymentIntentId);
+
+    // Already cancelled?
+    if (order.status === "Cancelled") {
+      console.log("⚠️ Order already cancelled");
+      return res
+        .status(400)
+        .json({ success: false, message: "Order already cancelled" });
+    }
+
+    // Update order status first
+    order.status = "Cancelled";
+    await order.save();
+
+    // Handle Stripe Refund
+    console.log("🔑 Stripe Secret Key (TEMP):", process.env.STRIPE_SECRET_KEY);
+
+    // if (order.paymentMethod === "stripe" && order.paymentIntentId) {
+    if (order.paymentMethod === "Stripe" && order.paymentIntentId) {
+      console.log("💡 Entered Stripe Refund Block");
+      try {
+        console.log("📦 Fetching Payment Intent from Stripe...");
+        const paymentIntent = await stripe.paymentIntents.retrieve(
+          order.paymentIntentId
+        );
+        console.log("Payment Intent Retrieved:", paymentIntent.id);
+        console.log("Payment Intent Status:", paymentIntent.status);
+
+        if (paymentIntent.status === "succeeded") {
+          const refund = await stripe.refunds.create({
+            payment_intent: order.paymentIntentId,
+          });
+          console.log("✅ Refund created:", refund.id);
+        } else {
+          console.log("⚠️ Payment Intent not succeeded, refund skipped.");
+        }
+      } catch (stripeError) {
+        console.error("❌ Stripe refund error:", stripeError);
+        return res
+          .status(500)
+          .json({ success: false, message: "Failed to process refund" });
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Order cancelled successfully" });
+  } catch (error) {
+    console.error("❌ Error in cancelOrder controller:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+// module.exports = { cancelOrder };
 
 // get all orders to display on admin panel
 const getAllOrders = async (req, res) => {
@@ -346,4 +509,5 @@ module.exports = {
   userOrders,
   updateOrderStatus,
   verifyStripe,
+  cancelOrder,
 };

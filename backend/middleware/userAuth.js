@@ -6,14 +6,14 @@ const authenticateUser = async (req, res, next) => {
   if (token && token.startsWith('"') && token.endsWith('"')) {
     token = token.slice(1, -1); // Remove surrounding quotes
   }
-  console.log("token received by the backend:", token);
+  // console.log("token received by the backend:", token);
   if (!token) {
     return res.status(401).json({
       success: false,
       message: "Not Authorized, No Token -- Login Again!",
     });
   }
-  console.log("Decoded token:", jwt.decode(token));
+  // console.log("Decoded token:", jwt.decode(token));
 
   try {
     const decoded_token = jwt.verify(token, process.env.JWT_SECRET);

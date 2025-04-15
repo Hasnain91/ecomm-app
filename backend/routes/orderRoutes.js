@@ -6,6 +6,7 @@ const {
   getAllOrders,
   userOrders,
   updateOrderStatus,
+  cancelOrder,
 } = require("../controllers/orderController");
 const adminAuth = require("../middleware/adminAuth");
 const authenticateUser = require("../middleware/userAuth");
@@ -25,5 +26,16 @@ router.post("/user-orders", authenticateUser, userOrders);
 
 //Verify Payment
 router.post("/verify-stripe", authenticateUser, verifyStripe);
+
+// Refund if stripe cancelled
+router.post(
+  "/refund",
+  (req, res, next) => {
+    console.log("✅ Hit the route");
+    next();
+  },
+  adminAuth,
+  cancelOrder
+);
 
 module.exports = router;
