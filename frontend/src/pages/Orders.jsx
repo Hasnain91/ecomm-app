@@ -62,15 +62,8 @@ const Orders = () => {
             data-aos="zoom-in"
           >
             <div className="flex items-start gap-6 text-sm">
-              {/* {console.log("Current product in loop is: ", product)} */}
               <img
                 className="w-16 sm:w-20"
-                // src={product?.image[0]}
-                // src={
-                //   product?.image && Array.isArray(product.image)
-                //     ? product.image[0]
-                //     : "fallback_image_url"
-                // } // Provide a fallback image URL here
                 src={
                   product?.image && product.image.length > 0
                     ? product.image[0]

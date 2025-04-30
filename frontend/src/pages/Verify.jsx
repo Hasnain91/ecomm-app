@@ -30,7 +30,7 @@ const Verify = () => {
       if (res.success) {
         dispatch({ type: "cart/clearCart" });
         navigate("/orders");
-        toast.success("Payment verified successfully!");
+        // toast.success("Payment verified successfully!");
       } else {
         navigate("/cart");
         toast.error("Payment verification failed. Please try again.");

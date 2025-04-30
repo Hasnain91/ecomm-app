@@ -93,9 +93,13 @@ const Orders = ({ token }) => {
   // };
   const cancelOrder = async () => {
     const order = selectedOrder;
+    let originalStatus;
     try {
       if (!order) return;
       console.log("Order that will be cancelled: ", order);
+
+      // Save the original status in case we need to revert
+      originalStatus = order.status;
 
       // Update the order status in the UI immediately
       const updatedOrder = { ...order, status: "Cancelled" };
@@ -113,7 +117,16 @@ const Orders = ({ token }) => {
         );
 
         if (!refundRes.data.success) {
+          // If refund fails, revert the status and show an error message
           toast.error(refundRes.data.message || "Refund failed.");
+
+          // Revert the status back to its original value
+          const revertedOrder = { ...order, status: originalStatus };
+          setOrders((prevOrders) =>
+            prevOrders.map((ord) =>
+              ord._id === revertedOrder._id ? revertedOrder : ord
+            )
+          );
           setShowModal(false);
           return;
         }
@@ -122,6 +135,14 @@ const Orders = ({ token }) => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Cancellation failed.");
+
+      // In case of an error, revert the status back to the original
+      const revertedOrder = { ...order, status: originalStatus };
+      setOrders((prevOrders) =>
+        prevOrders.map((ord) =>
+          ord._id === revertedOrder._id ? revertedOrder : ord
+        )
+      );
     } finally {
       setShowModal(false);
       setSelectedOrder(null);
