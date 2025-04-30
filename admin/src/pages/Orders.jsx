@@ -63,11 +63,47 @@ const Orders = ({ token }) => {
     setShowModal(true);
   };
 
+  // const cancelOrder = async () => {
+  //   const order = selectedOrder;
+  //   try {
+  //     if (!order) return;
+  //     console.log("Order that will be cancelled: ", order);
+
+  //     if (order.paymentMethod === "Stripe" && order.paymentIntentId) {
+  //       const refundRes = await axios.post(
+  //         `${backendUrl}/api/order/refund`,
+  //         { orderId: order._id },
+  //         { headers: { token } }
+  //       );
+
+  //       if (!refundRes.data.success) {
+  //         toast.error(refundRes.data.message || "Refund failed.");
+  //         setShowModal(false);
+  //         return;
+  //       }
+
+  //       toast.success("Refund processed.");
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.response?.data?.message || "Cancellation failed.");
+  //   } finally {
+  //     setShowModal(false);
+  //     setSelectedOrder(null);
+  //   }
+  // };
   const cancelOrder = async () => {
     const order = selectedOrder;
     try {
       if (!order) return;
       console.log("Order that will be cancelled: ", order);
+
+      // Update the order status in the UI immediately
+      const updatedOrder = { ...order, status: "Cancelled" };
+      setOrders((prevOrders) =>
+        prevOrders.map((ord) =>
+          ord._id === updatedOrder._id ? updatedOrder : ord
+        )
+      );
 
       if (order.paymentMethod === "Stripe" && order.paymentIntentId) {
         const refundRes = await axios.post(
